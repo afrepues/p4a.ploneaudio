@@ -1,0 +1,8 @@
+======================
+p4a.ploneaudio Changes
+======================
+
+p4a.ploneaudio 1.0alpha1 (unreleased)
+=====================================
+
+* First release with unrecorded set of functionality (Rocky Burt)
