@@ -21,8 +21,20 @@ import p4a.audio
 import p4a.ploneaudio
 
 class IntegrationTestCase(PloneTestCase.PloneTestCase):
+    """Plone based integration test for p4a.ploneaudio."""
+
     def _setup(self):
         PloneTestCase.PloneTestCase._setup(self)
         zcml.load_config('configure.zcml', p4a.common)
         zcml.load_config('configure.zcml', p4a.audio)
         zcml.load_config('configure.zcml', p4a.ploneaudio)
+        zcml.load_config('configure.zcml', p4a.fileimage)
+
+def testclass_builder(**kwargs):   
+    class GeneratedIntegrationTestCase(IntegrationTestCase):
+        """Generated integration TestCase for p4a.ploneaudio."""
+
+    for key, value in kwargs.items():
+        setattr(GeneratedIntegrationTestCase, key, value)
+
+    return GeneratedIntegrationTestCase

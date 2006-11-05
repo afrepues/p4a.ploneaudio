@@ -1,0 +1,78 @@
+Plone Audio
+===========
+
+Audio support in Plone now consists of taking the zope3 audio support
+and wrapping it with a Plone integration layer.
+
+We begin this process by creating a new instance of a file content
+type.
+
+  >>> id = self.folder.invokeFactory(self.file_type, 'testfile1')
+  >>> testfile1 = self.folder[id]
+
+By default, doing an IAudio adapter lookup on that file should fail since
+it's media properties have not yet been activated.
+
+  >>> from p4a.audio.interfaces import IAudio
+  >>> IAudio(testfile1)
+  Traceback (most recent call last):
+  ...
+  TypeError: ('Could not adapt'...)
+
+So the next step would be to actually activate the audio enhancements on
+this file instance.
+
+  >>> media_config = testfile1.restrictedTraverse('@@media-config.html')
+  >>> media_config.media_activated
+  False
+  >>> media_config.media_activated = True
+  >>> media_config.media_activated
+  True
+
+Now adapting it should work fine.
+
+  >>> IAudio(testfile1)
+  <p4a.audio ATCTFileAudio title=None>
+
+Lets do the same thing with a folder.  Since p4a.audio allows folders
+to additionally be media enhanced (as audio containers).
+
+  >>> id = self.folder.invokeFactory('Folder', 'testfolder1')
+  >>> testfolder1 = self.folder[id]
+
+So the next step would be to actually activate the audio enhancements on
+this folder.
+
+  >>> media_config = testfolder1.restrictedTraverse('@@media-config.html')
+  >>> media_config.media_activated
+  False
+  >>> media_config.media_activated = True
+  >>> media_config.media_activated
+  True
+
+Make sure the *IAudioFileProvider* adapter works on the folder.
+
+  >>> from p4a.audio.interfaces import IAudioProvider
+  >>> adapted = IAudioProvider(testfolder1)
+  >>> adapted.audio_items
+  []
+
+We know that Smart Folders are potential audio containers as well.  So we
+should test those as well.
+
+Need more permissions first to create smart folders, will adopt ``Manager``
+role.
+
+  >>> self.setRoles('Manager')
+
+  >>> id = self.folder.invokeFactory('Topic', 'testtopic1')
+  >>> testtopic1 = self.folder[id]
+  
+Make sure sure we can activate audio enhancements on this smart folder.
+
+  >>> media_config = testtopic1.restrictedTraverse('@@media-config.html')
+  >>> media_config.media_activated
+  False
+  >>> media_config.media_activated = True
+  >>> media_config.media_activated
+  True

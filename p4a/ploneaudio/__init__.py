@@ -11,3 +11,10 @@ def has_ataudio_support():
         return True
     except:
         return False
+
+def has_blobfile_support():
+    try:
+        import Products.BlobFile
+    except ImportError, e:
+        return False
+    return True
