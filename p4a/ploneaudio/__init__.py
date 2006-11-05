@@ -1,3 +1,9 @@
+def has_fatsyndication_support():
+    try:
+        import Products.fatsyndication
+    except ImportError, e:
+        return False
+    return True
 
 def has_ataudio_support():
     try:

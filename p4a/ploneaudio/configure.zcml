@@ -63,4 +63,8 @@
       zcml:condition="installed Products.ATAudio"
       />
 
+  <include 
+      file="syndication.zcml" 
+      zcml:condition="installed Products.fatsyndication" />
+
 </configure>
