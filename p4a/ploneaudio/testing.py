@@ -6,6 +6,8 @@ PRODUCT_DEPENDENCIES = ['MimetypesRegistry', 'PortalTransforms']
 
 if ploneaudio.has_fatsyndication_support():
     PRODUCT_DEPENDENCIES += ['basesyndication', 'fatsyndication']
+if ploneaudio.has_blobfile_support():
+    DEPENDENCIES += ['BlobFile']
 
 # Install all (product-) dependencies, install them too
 for dependency in PRODUCT_DEPENDENCIES + DEPENDENCIES:
