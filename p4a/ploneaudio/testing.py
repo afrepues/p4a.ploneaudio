@@ -1,7 +1,13 @@
 from p4a import ploneaudio
 from Products.PloneTestCase import PloneTestCase
 
-DEPENDENCIES = ['Archetypes', 'ATAudio']
+DEPENDENCIES = ['Archetypes']
+try:
+    import Products.ATAudio
+    DEPENDENCIES.append('ATAudio')
+except ImportError, e:
+    pass
+
 PRODUCT_DEPENDENCIES = ['MimetypesRegistry', 'PortalTransforms']
 
 if ploneaudio.has_fatsyndication_support():

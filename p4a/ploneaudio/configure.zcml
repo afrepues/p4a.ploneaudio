@@ -15,7 +15,7 @@
   </class>
 
   <class class="Products.ATContentTypes.content.file.ATFile">
-      <implements interface="p4a.audio.interfaces.IPossibleMedia" />
+      <implements interface="p4a.audio.interfaces.IPossibleAudio" />
   </class>
 
   <adapter factory=".atct.ATCTFileAudio" />
@@ -29,13 +29,13 @@
       />
 
   <subscriber
-      for="p4a.audio.interfaces.IPossibleMedia
+      for="p4a.audio.interfaces.IPossibleAudio
            zope.app.event.interfaces.IObjectCreatedEvent"
       handler=".atct.attempt_media_activation"
       />
 
   <subscriber
-      for="p4a.audio.interfaces.IPossibleMedia
+      for="p4a.audio.interfaces.IPossibleAudio
            zope.app.event.interfaces.IObjectModifiedEvent"
       handler=".atct.attempt_media_activation"
       />
