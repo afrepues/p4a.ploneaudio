@@ -2,7 +2,14 @@
 p4a.ploneaudio Changes
 ======================
 
-p4a.ploneaudio 1.0alpha1 (unreleased)
+p4a.ploneaudio 1.0alpha2 (unreleased)
 =====================================
 
-* First release with unrecorded set of functionality (Rocky Burt)
+Features
+--------
+
+* Audio support can now be activated/deactivated by using the
+  quickinstaller to install/uninstall the product
+
+* Menu item in actions dropdown now shows either "activate" audio or 
+  "deactivate" audio depending on the state of the current context
