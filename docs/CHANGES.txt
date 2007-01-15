@@ -2,7 +2,7 @@
 p4a.ploneaudio Changes
 ======================
 
-p4a.ploneaudio 1.0alpha2 (unreleased)
+p4a.ploneaudio 1.0alpha2 (2007-01-15)
 =====================================
 
 Features
