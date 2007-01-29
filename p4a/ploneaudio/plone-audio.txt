@@ -119,8 +119,8 @@ course the doctest comparison line is a real disaster.)
   >>> widget = queryAdapter(field, IMediaPlayer, name='audio/mpeg')
   >>> widget('/testfolder1/testfile2/file')
   '\n        <div class="mp3-player">\n            <object type="application/x-shockwave-flash"\n                    data="http://nohost/plone/++resource++flashmp3player/musicplayer.swf?song_url=/testfolder1/testfile2/file"\n                    style="margin-top: 2px"\n                    width="17" \n                    height="17">\n                    <param name="movie"\n                           value="http://nohost/plone/++resource++flashmp3player/musicplayer.swf?song_url=/testfolder1/testfile2/file"\n                    />\n            </object>\n        </div>\n        '
-  
 
+ 
 We know that Smart Folders are potential audio containers as well.  So we
 should test those as well.
 
