@@ -5,12 +5,15 @@ from zope.testing import doctestunit
 from p4a import ploneaudio
 from p4a.ploneaudio import testing
 from Testing.ZopeTestCase.zopedoctest import ZopeDocFileSuite
+from Testing.ZopeTestCase import FunctionalDocFileSuite
 from App import Common
 from Products.PloneTestCase import layer
 
 def test_suite():
     suite = unittest.TestSuite((
         doctestunit.DocTestSuite('p4a.ploneaudio.atct'),
+        FunctionalDocFileSuite('plone-audio-functional.txt',
+                               package='p4a.ploneaudio')
         ))
     
     if ploneaudio.has_ataudio_support():

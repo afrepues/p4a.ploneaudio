@@ -1,0 +1,60 @@
+Plone4Artists Audio Plone Functional
+====================================
+
+Set Up
+------
+
+Load all of Five's configuration.
+
+    >>> import Products.Five
+    >>> import p4a.audio
+    >>> import p4a.ploneaudio
+    >>> import Products.CMFPlone
+    >>> from Products.Five.zcml import load_config
+    >>> load_config('configure.zcml', package=Products.Five)
+    >>> load_config('configure.zcml', package=Products.CMFPlone)
+    >>> load_config('configure.zcml', package=p4a.audio)
+    >>> load_config('configure.zcml', package=p4a.ploneaudio)
+
+Enable local component lookup hooks.
+
+    >>> import zope.app.component.hooks
+    >>> zope.app.component.hooks.setHooks()
+
+Making a site
+-------------
+
+Manager user setup.
+
+    >>> uf = app.acl_users
+    >>> uf._doAddUser('admin', 'admin', ['Manager'], [])
+
+Create the test browser we'll be using:
+
+    >>> from Products.Five.testbrowser import Browser
+    >>> browser = Browser()
+    >>> browser.addHeader('Authorization', 'Basic admin:admin')
+
+Setup a plone site.
+
+    >>> browser.open('http://localhost/manage_addProduct/CMFPlone/addPloneSiteForm')
+    >>> browser.getControl(name='id').value = 'plonesite1'
+    >>> browser.getControl(name='title').value = 'Plone Site #1'
+    >>> browser.getControl('Add Plone Site').click()
+
+Browse to the plone site and install the Plone4ArtistsAudio product.
+
+    >>> browser.open('http://localhost/plonesite1')
+    >>> browser.getLink('Preferences').click()
+    >>> browser.getLink('Add/Remove Products').click()
+    >>> form = browser.getForm(action='http://localhost/plonesite1/portal_quickinstaller/installProducts')
+    >>> form.getControl(name='products:list').value = 'Plone4ArtistsAudio'
+    >>> form.submit('Install')
+    >>> browser.getLink('Home').click()
+
+Now set setup a test folder.
+
+    >>> browser.getLink('Folder')
+    >>> browser.getControl(name='title').value = 'Test Audio Album'
+    >>> browser.getControl(name='Save').click()
+
