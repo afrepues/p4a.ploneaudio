@@ -1,60 +1,46 @@
 Plone4Artists Audio Plone Functional
 ====================================
 
+This functional test assumes a plone site has already been installed
+and that we're ready to actually start dealing with audio files.
+
 Set Up
 ------
 
-Load all of Five's configuration.
-
-    >>> import Products.Five
-    >>> import p4a.audio
-    >>> import p4a.ploneaudio
-    >>> import Products.CMFPlone
-    >>> from Products.Five.zcml import load_config
-    >>> load_config('configure.zcml', package=Products.Five)
-    >>> load_config('configure.zcml', package=Products.CMFPlone)
-    >>> load_config('configure.zcml', package=p4a.audio)
-    >>> load_config('configure.zcml', package=p4a.ploneaudio)
-
-Enable local component lookup hooks.
-
-    >>> import zope.app.component.hooks
-    >>> zope.app.component.hooks.setHooks()
-
-Making a site
--------------
-
-Manager user setup.
+Begin by setting up our Manager user.
 
     >>> uf = app.acl_users
     >>> uf._doAddUser('admin', 'admin', ['Manager'], [])
 
-Create the test browser we'll be using:
+Next we install the product.
 
-    >>> from Products.Five.testbrowser import Browser
-    >>> browser = Browser()
+    >>> from p4a.ploneaudio import sitesetup
+    >>> sitesetup.setup_portal(app.plone)
+
+Audio Folders
+-------------
+
+We begin by setting up a test folder.
+
+    >>> import Products.Five.testbrowser
+    >>> browser = Products.Five.testbrowser.Browser()
     >>> browser.addHeader('Authorization', 'Basic admin:admin')
+    >>> browser.open('http://localhost/plone')
 
-Setup a plone site.
-
-    >>> browser.open('http://localhost/manage_addProduct/CMFPlone/addPloneSiteForm')
-    >>> browser.getControl(name='id').value = 'plonesite1'
-    >>> browser.getControl(name='title').value = 'Plone Site #1'
-    >>> browser.getControl('Add Plone Site').click()
-
-Browse to the plone site and install the Plone4ArtistsAudio product.
-
-    >>> browser.open('http://localhost/plonesite1')
-    >>> browser.getLink('Preferences').click()
-    >>> browser.getLink('Add/Remove Products').click()
-    >>> form = browser.getForm(action='http://localhost/plonesite1/portal_quickinstaller/installProducts')
-    >>> form.getControl(name='products:list').value = 'Plone4ArtistsAudio'
-    >>> form.submit('Install')
-    >>> browser.getLink('Home').click()
-
-Now set setup a test folder.
-
-    >>> browser.getLink('Folder')
+    >>> browser.getLink('Folder').click()
     >>> browser.getControl(name='title').value = 'Test Audio Album'
-    >>> browser.getControl(name='Save').click()
+    >>> browser.getControl('Save').click()
 
+At this point we're inside an empty folder.  The first test here is to
+*audio activate* this folder.
+
+    >>> browser.getLink('Activate Audio').click()
+
+Since the album/folder is currently empty, the total length amount should
+be zero.
+
+    >>> 'This CD has no audio files added to it.' in browser.contents
+    True
+
+    >>> '00:00' in browser.contents
+    True

@@ -11,9 +11,7 @@ from Products.PloneTestCase import layer
 
 def test_suite():
     suite = unittest.TestSuite((
-        doctestunit.DocTestSuite('p4a.ploneaudio.atct'),
-        FunctionalDocFileSuite('plone-audio-functional.txt',
-                               package='p4a.ploneaudio')
+        doctestunit.DocTestSuite('p4a.ploneaudio.atct')
         ))
     
     if ploneaudio.has_ataudio_support():
@@ -33,6 +31,13 @@ def test_suite():
         'plone-audio.txt',
         package='p4a.ploneaudio',
         test_class=testing.testclass_builder(file_type='File')
+        )
+    )
+
+    suite.addTest(FunctionalDocFileSuite(
+        'plone-audio-functional.txt',
+        package='p4a.ploneaudio',
+        test_class=testing.testclass_builder()
         )
     )
     

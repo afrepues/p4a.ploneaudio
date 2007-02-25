@@ -1,7 +1,7 @@
 from p4a import ploneaudio
 from Products.PloneTestCase import PloneTestCase
 
-DEPENDENCIES = ['Archetypes']
+DEPENDENCIES = ['CMFonFive', 'Archetypes']
 try:
     import Products.ATAudio
     DEPENDENCIES.append('ATAudio')
