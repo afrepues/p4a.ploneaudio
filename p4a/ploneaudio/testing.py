@@ -1,5 +1,6 @@
 from p4a import ploneaudio
 from Products.PloneTestCase import PloneTestCase
+from zope.app.component import hooks
 
 DEPENDENCIES = ['CMFonFive', 'Archetypes']
 try:
@@ -37,6 +38,7 @@ class IntegrationTestCase(PloneTestCase.PloneTestCase):
         zcml.load_config('configure.zcml', p4a.audio)
         zcml.load_config('configure.zcml', p4a.ploneaudio)
         zcml.load_config('configure.zcml', p4a.fileimage)
+        hooks.setHooks()
 
 def testclass_builder(**kwargs):   
     class GeneratedIntegrationTestCase(IntegrationTestCase):

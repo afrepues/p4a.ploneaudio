@@ -10,13 +10,15 @@ from App import Common
 from Products.PloneTestCase import layer
 
 def test_suite():
-    suite = unittest.TestSuite((
-        doctestunit.DocTestSuite('p4a.ploneaudio.atct')
-        ))
+    suite = unittest.TestSuite()
+    if __name__ not in ('__main__', 'p4a.ploneaudio.tests'):
+        return suite
+    
+    suite.addTest(doctestunit.DocTestSuite('p4a.ploneaudio.atct'))
     
     if ploneaudio.has_ataudio_support():
-        from p4a.ploneaudio.ataudio import tests
-        suite.addTest(tests.test_suite())
+        from p4a.ploneaudio.ataudio import ataudiotests
+        suite.addTest(ataudiotests.test_suite())
 
     if ploneaudio.has_fatsyndication_support():
         suite.addTest(ZopeDocFileSuite(
@@ -35,7 +37,7 @@ def test_suite():
     )
 
     suite.addTest(FunctionalDocFileSuite(
-        'plone-audio-functional.txt',
+        'browser.txt',
         package='p4a.ploneaudio',
         test_class=testing.testclass_builder()
         )
