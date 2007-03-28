@@ -213,16 +213,6 @@ def update_dublincore(obj, evt):
     
     audio = interfaces.IAudio(obj)
     obj.setTitle(audio.title)
-    desc = ''
-    fields = [(x, interfaces.IAudio[x])
-               for x in interfaces.IAudio if x != 'title']
-    for name, field in fields:
-        if isinstance(field, p4afile.FileField):
-            continue
-        value = getattr(audio, name) or None
-        if value is not None:
-            desc += u'%s is %s\n' % (field.title, unicode(value))
-    obj.setDescription(desc)
 
 def update_catalog(obj, evt):
     """Reindex the object in the catalog.
