@@ -4,7 +4,7 @@ from p4a.common import site
 
 from StringIO import StringIO
 
-from Products.CMFCore.utils import getToolByName 
+from Products.CMFCore.utils import getToolByName, SimpleRecord 
 
 from Products.CMFPlone.CatalogTool import registerIndexableAttribute
 from zope.component.exceptions import ComponentLookupError
@@ -77,8 +77,8 @@ def setup_indexes(portal):
 
     if not 'audio_artist' in pc.indexes():
 
-        extra = cmfutils.SimpleRecord(lexicon_id='plaintext_lexicon',
-        	                          index_type='Okapi BM25 Rank')
+        extra = SimpleRecord(lexicon_id='plaintext_lexicon',
+                             index_type='Okapi BM25 Rank')
         
         pc.addIndex('audio_artist', 'ZCTextIndex', extra)
         pc.manage_reindexIndex('audio_artist')
