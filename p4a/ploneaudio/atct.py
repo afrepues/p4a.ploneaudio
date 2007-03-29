@@ -167,17 +167,78 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
 
+@interface.implementer(interfaces.IAudioContainer)
+@component.adapter(atctifaces.IATFolder)
+def ATCTFolderAudioContainer(context):
+    if not interfaces.IAudioContainerEnhanced.providedBy(context):
+        return None
+    return _ATCTFolderAudioContainer(context)
+
+class _ATCTFolderAudioContainer(audioanno.AnnotationAudioContainer):
+    """An IAudioContainer adapter designed to handle ATCT based file content.
+    """
+
+    interface.implements(interfaces.IAudioContainer)
+    component.adapts(atctifaces.IATFolder)
+
+    ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFolderAudioContainer'
+
+
+    @property
+    def _default_charset(self):
+        """The charset determined by the active Plone site to be the
+        default.
+        """
+
+        charset = getattr(self, '__cached_default_charset', None)
+        if charset is not None:
+            return charset
+        try:
+            props = cmfutils.getToolByName(self.context, 'portal_properties')
+            self.__cached_default_charset = props.site_properties.default_charset
+        except:
+            self.__cached_default_charset = DEFAULT_CHARSET
+        return self.__cached_default_charset
+
+    def _u(self, v):
+        """Return the unicode object representing the value passed in an
+        as error-immune manner as possible.
+        """
+
+        return utils.unicodestr(v, self._default_charset)
+
+    def _get_audio_image(self):
+        v = self.audio_data.get('audio_image', None)
+        if v == None or v.get_size() == 0:
+            return None
+        return v
+    def _set_audio_image(self, v):
+        if v == interfaces.IAudioContainer['audio_image'].missing_value:
+            return
+        upload = v
+        if isinstance(upload, ofsimage.Image):
+            image = upload
+        else:
+            image = ofsimage.Image(id=upload.filename, 
+                                   title=upload.filename, 
+                                   file=upload)
+        self.audio_data['audio_image'] = image
+    audio_image = property(_get_audio_image, _set_audio_image)
+
+    def __str__(self):
+        return '<p4a.audio ATCTFolderAudio title=%s>' % self.title
+    __repr__ = __str__
 
 def load_metadata(obj, evt):
     """An event handler for loading metadata.
     """
-    
+
     obj._load_audio_metadata()
 
 def sync_audio_metadata(obj, evt):
     """An event handler for saving id3 tag information back onto the file.
     """
-    
+
     audio = interfaces.IAudio(obj)
     for description in evt.descriptions:
         if isinstance(description, objectevent.Attributes):
@@ -199,7 +260,7 @@ def attempt_media_activation(obj, evt):
     view = obj.restrictedTraverse('@@media-config.html')
     if view.media_activated:
         return
-    
+
     mime_type = obj.get_content_type()
     try:
         accessor = component.getAdapter(obj, 
@@ -216,7 +277,7 @@ def attempt_media_activation(obj, evt):
 def update_dublincore(obj, evt):
     """Update the dublincore properties.
     """
-    
+
     audio = interfaces.IAudio(obj)
     obj.setTitle(audio.title)
 
@@ -228,9 +289,6 @@ def update_catalog(obj, evt):
     
 def SearchableText(obj, portal, **kwargs):
     """ Used by the catalog for basic full text indexing """
-
-#    import pdb
-#    pdb.set_trace()
     
     adapter = queryAdapter(obj, interfaces.IAudio)
 
