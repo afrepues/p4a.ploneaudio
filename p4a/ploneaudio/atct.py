@@ -8,12 +8,16 @@ from zope.app.event import objectevent
 from p4a.audio import audioanno
 from p4a.audio import interfaces
 from p4a.audio import utils
+from p4a.audio.genre import GENRE_VOCABULARY
 
 from p4a.fileimage import file as p4afile
 from p4a.fileimage import utils as fileutils
 
 from Products.ATContentTypes import interface as atctifaces  
 from Products.CMFCore import utils as cmfutils
+from Products.CMFPlone.CatalogTool import registerIndexableAttribute
+
+from zope.component import queryAdapter
 
 class ATCTFolderAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
@@ -48,6 +52,7 @@ class ATCTTopicAudioProvider(object):
                 files.append(adapted)
 
         return files
+
 
 @interface.implementer(interfaces.IAudio)
 @component.adapter(atctifaces.IATFile)
@@ -162,6 +167,7 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
 
+
 def load_metadata(obj, evt):
     """An event handler for loading metadata.
     """
@@ -219,3 +225,23 @@ def update_catalog(obj, evt):
     """
 
     obj.reindexObject()
+    
+def SearchableText(obj, portal, **kwargs):
+    """ Used by the catalog for basic full text indexing """
+
+#    import pdb
+#    pdb.set_trace()
+    
+    adapter = queryAdapter(obj, interfaces.IAudio)
+
+    if adapter:
+        return_list = [obj.SearchableText(),
+                       adapter.artist,
+                       GENRE_VOCABULARY.getTerm(adapter.genre).title]
+        return ' '.join(return_list)
+    else:
+        return obj.SearchableText()
+    
+registerIndexableAttribute('SearchableText', SearchableText)
+
+    
