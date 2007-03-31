@@ -293,9 +293,13 @@ def SearchableText(obj, portal, **kwargs):
     adapter = queryAdapter(obj, interfaces.IAudio)
 
     if adapter:
+        if GENRE_VOCABULARY.hasTerm(adapter.genre):
+            genre = GENRE_VOCABULARY.getTerm(adapter.genre).title
+        else:
+            genre = ''
         return_list = [obj.SearchableText(),
                        adapter.artist,
-                       GENRE_VOCABULARY.getTerm(adapter.genre).title]
+                       genre]
         return ' '.join(return_list)
     else:
         return obj.SearchableText()
