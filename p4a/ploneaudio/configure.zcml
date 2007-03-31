@@ -38,6 +38,12 @@
 
   <subscriber
       for="p4a.audio.interfaces.IPossibleAudio
+           zope.app.container.interfaces.IObjectAddedEvent"
+      handler=".atct.attempt_media_activation"
+      />
+
+  <subscriber
+      for="p4a.audio.interfaces.IPossibleAudio
            zope.app.event.interfaces.IObjectModifiedEvent"
       handler=".atct.attempt_media_activation"
       />
