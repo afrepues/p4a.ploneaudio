@@ -15,13 +15,14 @@ def setup_portal(portal):
     setup_site(portal)
     setup_indexes(portal)
     setup_metadata(portal)
-    setup_smartfolder_indexes(portal)
+    addSmartFolderIndexAndMetadata(portal)
     
     qi = getToolByName(portal, 'portal_quickinstaller')
     qi.installProducts(['CMFonFive'])
 
 
 def audio_artist(object, portal, **kwargs):
+    """Return the name of the artist in the audio file for use in searching the catalog."""
     try:
         audiofile = IAudio(object)
         return audiofile.artist
@@ -32,6 +33,7 @@ def audio_artist(object, portal, **kwargs):
 registerIndexableAttribute('audio_artist', audio_artist)
 
 def audio_genre_id(object, portal, **kwargs):
+    """Return the genre id of the audio file for use in searching the catalog."""
     try:
         audiofile = IAudio(object)
         return audiofile.genre
@@ -95,7 +97,6 @@ def setup_metadata(portal):
        use the Plone ExtensibleIndexableObjectWrapper."""
        
     out = StringIO()
-    
     pc = getToolByName(portal, 'portal_catalog', None)
 
     try:
@@ -119,24 +120,44 @@ def setup_smartfolder_indexes(portal):
     of the MP3s added to the site."""
     
     out = StringIO()
-    
-    sft = getToolByName(portal, 'portal_atct')
+            
+index_mapping = {'audio_artist':
+                    {'name': 'Artist name',
+                     'description': 'The name of the artist.',
+                     'enabled': True,
+                     'criteria': ('ATSimpleStringCriterion',)},
+                 'audio_genre_id':
+                    {'name': 'Genre',
+                     'description': 'The genre id of the song.'
+                                    'this is a number 0-147. '
+                                    'See genre.py for the genre names.',
+                     'enabled': True,
+                     'criteria': ('ATSimpleIntCriterion',)},
+                 'Format':
+                    {'name': 'MIME Types',
+                     'description': 'The MIME type of the file. '
+                                 'For an MP3 file, this is audio/mpeg.',
+                     'enabled': True,
+                     'criteria': ('ATSimpleStringCriterion',)},
+                 }
 
-    print >>out, 'enabling the Metadata to appear in the smart folder settings'
-
-    if 'Format' not in sft.getIndexes(enabledOnly=True):
-        sft.addIndex("Format", "Mime Types", "The type of the Item", enabled=True)
-    elif 'Format' not in sft.getIndexes():
-    # index exists, but is disabled 
-        sft.updateIndex('Format', enabled=True)
-
-    if 'Format' not in sft.getAllMetadata(enabledOnly=True):
-        sft.addMetadata("Format", "Mime Types", "The type of the Item", enabled=True)
-    elif 'Format' not in sft.getAllMetadata():     
-    # metadata exist, but are disabled     
-        sft.updateMetadata('Format', enabled=True) 
-
-
+def addSmartFolderIndexAndMetadata(portal,
+                                   indexes=('audio_artist',
+                                            'audio_genre_id',
+                                            'Format')):
+    """Adds the default indexes to be available from smartfolders"""
+    atct_config = getToolByName(portal, 'portal_atct', None)
+    if atct_config is not None:
+        for index in indexes:
+            index_info=index_mapping[index]
+            atct_config.updateIndex(index, friendlyName=index_info['name'],
+                                 description=index_info['description'],
+                                 enabled=index_info['enabled'],
+                                 criteria=index_info['criteria'])
+            atct_config.updateMetadata(index, friendlyName=index_info['name'],
+                                 description=index_info['description'],
+                                 enabled=True)
+                                     
 def _cleanup_utilities(site):
     raise NotImplementedError('Current ISiteManager support does not '
                               'include ability to clean up')
