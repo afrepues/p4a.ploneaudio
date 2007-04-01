@@ -229,6 +229,24 @@ class _ATCTFolderAudioContainer(audioanno.AnnotationAudioContainer):
         return '<p4a.audio ATCTFolderAudio title=%s>' % self.title
     __repr__ = __str__
 
+@interface.implementer(interfaces.IAudioContainer)
+@component.adapter(atctifaces.IATTopic)
+def ATCTTopicAudioContainer(context):
+    if not interfaces.IAudioContainerEnhanced.providedBy(context):
+        return None
+    return _ATCTTopicAudioContainer(context)
+
+class _ATCTTopicAudioContainer(_ATCTFolderAudioContainer):
+    """An IAudioContainer adapter designed to handle topics.
+    """
+
+    interface.implements(interfaces.IAudioContainer)
+    component.adapts(atctifaces.IATTopic)
+
+    def __str__(self):
+        return '<p4a.audio ATCTTopicAudio title=%s>' % self.title
+    __repr__ = __str__
+
 def load_metadata(obj, evt):
     """An event handler for loading metadata.
     """

@@ -1,3 +1,4 @@
+====================================
 Plone4Artists Audio Plone Functional
 ====================================
 
@@ -5,7 +6,7 @@ This functional test assumes a plone site has already been installed
 and that we're ready to actually start dealing with audio files.
 
 Set Up
-------
+======
 
 Begin by setting up our Manager user.
 
@@ -17,17 +18,40 @@ Next we install the product.
     >>> from p4a.ploneaudio import sitesetup
     >>> sitesetup.setup_portal(app.plone)
 
-Audio Folders
--------------
-
-We begin by setting up a test folder.
+And of course we get the test browser.
 
     >>> import Products.Five.testbrowser
     >>> portal_url = portal.absolute_url()
     >>> browser = Products.Five.testbrowser.Browser()
     >>> browser.addHeader('Authorization', 'Basic admin:admin')
-    >>> browser.open(portal_url)
 
+Smart Folders
+-------------
+
+Start by creating a new smart folder.
+
+    >>> browser.open(portal_url)
+    >>> browser.getLink('Smart Folder').click()
+    >>> browser.getControl(name='title').value = 'Test Smart Audio Album'
+    >>> browser.getControl('Save').click()
+
+At this point we're inside an empty smart folder.  The first test here is to
+*audio activate* this smart folder.
+
+    >>> browser.getLink('Activate Audio').click()
+
+Since the album/smart-folder is currently empty, the total length amount should
+be zero.
+
+    >>> '00:00' in browser.contents
+    True
+
+Audio Folders
+-------------
+
+We begin by setting up a test folder.
+
+    >>> browser.open(portal_url)
     >>> browser.getLink('Folder').click()
     >>> browser.getControl(name='title').value = 'Test Audio Album'
     >>> browser.getControl('Save').click()
@@ -39,9 +63,6 @@ At this point we're inside an empty folder.  The first test here is to
 
 Since the album/folder is currently empty, the total length amount should
 be zero.
-
-    >>> 'This CD has no audio files added to it.' in browser.contents
-    True
 
     >>> '00:00' in browser.contents
     True
@@ -182,9 +203,6 @@ Now the new metadata should be found
 
     >>> '00:03 (mm:ss)' in browser.contents
     True
-
-
-
 
 Creation of OGG file
 =======================

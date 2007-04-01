@@ -19,10 +19,12 @@
   </class>
 
   <adapter factory=".atct.ATCTFileAudio" />
+
   <adapter factory=".atct.ATCTFolderAudioContainer" />
   <adapter factory=".atct.ATCTFolderAudioProvider" />
-  <adapter factory=".atct.ATCTTopicAudioProvider" />
 
+  <adapter factory=".atct.ATCTTopicAudioProvider" />
+  <adapter factory=".atct.ATCTTopicAudioContainer" />
 
   <subscriber
       for="p4a.audio.interfaces.IAudioEnhanced
