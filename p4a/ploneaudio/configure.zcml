@@ -26,6 +26,9 @@
   <adapter factory=".atct.ATCTTopicAudioProvider" />
   <adapter factory=".atct.ATCTTopicAudioContainer" />
 
+  <adapter factory=".atct.ATCTBTreeFolderAudioProvider" />
+  <adapter factory=".atct.ATCTBTreeFolderAudioContainer" />
+
   <subscriber
       for="p4a.audio.interfaces.IAudioEnhanced
            zope.app.event.interfaces.IObjectModifiedEvent"

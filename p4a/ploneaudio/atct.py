@@ -36,6 +36,13 @@ class ATCTFolderAudioProvider(object):
 
         return files
 
+class ATCTBTreeFolderAudioProvider(ATCTFolderAudioProvider):
+    interface.implements(interfaces.IAudioProvider)
+    component.adapts(atctifaces.IATBTreeFolder)
+    
+    def __init__(self, context):
+        self.context = context
+
 class ATCTTopicAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
     component.adapts(atctifaces.IATTopic)
@@ -167,14 +174,7 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
 
-@interface.implementer(interfaces.IAudioContainer)
-@component.adapter(atctifaces.IATFolder)
-def ATCTFolderAudioContainer(context):
-    if not interfaces.IAudioContainerEnhanced.providedBy(context):
-        return None
-    return _ATCTFolderAudioContainer(context)
-
-class _ATCTFolderAudioContainer(audioanno.AnnotationAudioContainer):
+class _ATCTFolderishAudioContainer(audioanno.AnnotationAudioContainer):
     """An IAudioContainer adapter designed to handle ATCT based file content.
     """
 
@@ -226,26 +226,29 @@ class _ATCTFolderAudioContainer(audioanno.AnnotationAudioContainer):
     audio_image = property(_get_audio_image, _set_audio_image)
 
     def __str__(self):
-        return '<p4a.audio ATCTFolderAudio title=%s>' % self.title
+        return '<p4a.audio ATCTFolderishAudio title=%s>' % self.title
     __repr__ = __str__
+
+@interface.implementer(interfaces.IAudioContainer)
+@component.adapter(atctifaces.IATFolder)
+def ATCTFolderAudioContainer(context):
+    if not interfaces.IAudioContainerEnhanced.providedBy(context):
+        return None
+    return _ATCTFolderishAudioContainer(context)
 
 @interface.implementer(interfaces.IAudioContainer)
 @component.adapter(atctifaces.IATTopic)
 def ATCTTopicAudioContainer(context):
     if not interfaces.IAudioContainerEnhanced.providedBy(context):
         return None
-    return _ATCTTopicAudioContainer(context)
+    return _ATCTFolderishAudioContainer(context)
 
-class _ATCTTopicAudioContainer(_ATCTFolderAudioContainer):
-    """An IAudioContainer adapter designed to handle topics.
-    """
-
-    interface.implements(interfaces.IAudioContainer)
-    component.adapts(atctifaces.IATTopic)
-
-    def __str__(self):
-        return '<p4a.audio ATCTTopicAudio title=%s>' % self.title
-    __repr__ = __str__
+@interface.implementer(interfaces.IAudioContainer)
+@component.adapter(atctifaces.IATBTreeFolder)
+def ATCTBTreeFolderAudioContainer(context):
+    if not interfaces.IAudioContainerEnhanced.providedBy(context):
+        return None
+    return _ATCTFolderishAudioContainer(context)
 
 def load_metadata(obj, evt):
     """An event handler for loading metadata.

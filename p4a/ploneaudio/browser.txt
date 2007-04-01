@@ -310,12 +310,20 @@ Now check file's title and comment
     >>> 'XARadio - 12spora útvarp' in browser.contents
     True
 
-BTreeFolder-support broken:  issue #25
-======================================
+BTreeFolder Support
+===================
 
 First enable the adding of large plone folders via the portal_types
 
-    >>> app.plone.portal_types['Large Plone Folder'].global_allow = True
+    >>> portal_types = app.plone.portal_types
+    >>> portal_types['Large Plone Folder'].global_allow = True
+
+There's currently an annoying testbrowser bug that doesn't let us click
+on links with spaces in them.  So we'll do a little renaming of the portal
+type here.
+
+    >>> self.loginAsPortalOwner()
+    >>> portal_types.manage_renameObjects(['Large Plone Folder'], ['LargePloneFolder'])
 
 Visit the homepage, add a large folder, and finally audio-activiate it.
 
@@ -327,7 +335,7 @@ correctly (before the bug was fixed, you'd get 'ValueError: too many values
 to unpack')", this is because of a bug in zope.testbrowser.
 
     >>> browser.getControl(name='title').value = 'Large Music Folder'
-    >>> browser.getLink(name='form_submit').click()
+    >>> browser.getControl(name='form_submit').click()
     >>> browser.getLink('Activate Audio').click()
 
 
