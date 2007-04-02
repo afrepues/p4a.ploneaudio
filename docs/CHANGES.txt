@@ -16,10 +16,11 @@ Miscellaneous
 Features
 --------
 
-* Image and file widgets now show the existing file that has been uploaded. [Jim Mastro]
+* Image and file widgets now show the existing file that has been uploaded.
+  [Jim Mastro]
 
-* Audio container now has additional metadata fields 
-  (artist, year, genre, cover art image) [Nate Aune]
+* Audio container now has additional metadata fields (artist, year, genre,
+  cover art image) [Nate Aune]
 
 * Audio files now can have a track number (which is extracted from ID3),
   and files are automatically sorted in track listing. [Vincenzo Barone]
@@ -35,7 +36,8 @@ Features
   can create smart folders using artist and genre id as criteria. [Nate Aune]
 
 * Internationalized Plone4ArtistsAudio with i18n message ids, so that it 
-  can be translated into other languages. Added Japanese translation. [Jonathan Lewis]
+  can be translated into other languages. Added Japanese translation.
+  [Jonathan Lewis]
 
 * Description field now works as expected and description is added to 
   SearchableText so when you search for audio files, it will look in the audio
@@ -45,7 +47,11 @@ Features
 Bugfixes
 ---------
 
-* Fixed #17: Media is not activated when uploaded via WebDAV/FTP. Added new event to listen for when attempting media activation. This allows automatic activation to occur for WebDAV but requires a recent Archetypes 1.4 version (currently svn r7371). Will be available in Plone 2.5.3+. [Rocky Burt]
+* Fixed #17: Media is not activated when uploaded via WebDAV/FTP. Added
+  new event to listen for when attempting media activation. This allows
+  automatic activation to occur for WebDAV but requires a recent
+  Archetypes 1.4 version (currently svn r7371). Will be available in
+  Plone 2.5.3+. [Rocky Burt]
 
 * Fixed #25: Large folder (BTreeFolder) support is now fixed.
 
