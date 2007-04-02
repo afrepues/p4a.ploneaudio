@@ -1,9 +1,12 @@
 from zope import component
 from zope import interface
+from zope.schema import vocabulary 
 from p4a.audio import interfaces
 from Products.CMFCore import utils as cmfutils
 from Products.fatsyndication import adapters as fatadapters
 from Products.basesyndication import interfaces as baseinterfaces
+
+from p4a.audio import genre
 
 class AudioContainerFeed(fatadapters.BaseFeed):
     interface.implements(baseinterfaces.IFeed)
@@ -52,7 +55,26 @@ class AudioFeedEntry(fatadapters.BaseFeedEntry):
     
     def getTitle(self):
         return self.audio.title
-
+    
+    def getArtist(self):
+        """
+        """
+        return self.audio.artist
+    
+    def getDescription(self):
+        """
+        """
+        return self.audio.description
+    
+    def getCategory(self):
+        """
+        """
+        g = self.audio.genre
+        if g in genre.GENRE_VOCABULARY:
+            return genre.GENRE_VOCABULARY.getTerm(g).title
+        return u''
+    
+    
 class ATFileEnclosure(object):
     interface.implements(baseinterfaces.IEnclosure)
     component.adapts(interfaces.IAudioEnhanced)

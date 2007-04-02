@@ -25,6 +25,7 @@
     <page attribute="rdf"   name="feed.rdf" />
     <page attribute="rdf11" name="feed11.rdf" />
     <page attribute="rss"   name="rss.xml" />
+    <page attribute="itunes"   name="itunes.xml" />
   </browser:pages>
   <browser:pages
       for="p4a.audio.interfaces.IAudioEnhanced"
@@ -34,6 +35,7 @@
     <page attribute="rdf"   name="feed.rdf" />
     <page attribute="rdf11" name="feed11.rdf" />
     <page attribute="rss"   name="rss.xml" />
+    <page attribute="itunes"   name="itunes.xml" />
   </browser:pages>
 
 </configure>
