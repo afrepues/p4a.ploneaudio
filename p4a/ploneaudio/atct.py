@@ -8,12 +8,16 @@ from zope.app.event import objectevent
 from p4a.audio import audioanno
 from p4a.audio import interfaces
 from p4a.audio import utils
+from p4a.audio.genre import GENRE_VOCABULARY
 
 from p4a.fileimage import file as p4afile
 from p4a.fileimage import utils as fileutils
 
 from Products.ATContentTypes import interface as atctifaces  
 from Products.CMFCore import utils as cmfutils
+from Products.CMFPlone.CatalogTool import registerIndexableAttribute
+
+from zope.component import queryAdapter
 
 class ATCTFolderAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
@@ -32,6 +36,13 @@ class ATCTFolderAudioProvider(object):
 
         return files
 
+class ATCTBTreeFolderAudioProvider(ATCTFolderAudioProvider):
+    interface.implements(interfaces.IAudioProvider)
+    component.adapts(atctifaces.IATBTreeFolder)
+    
+    def __init__(self, context):
+        self.context = context
+
 class ATCTTopicAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
     component.adapts(atctifaces.IATTopic)
@@ -48,6 +59,7 @@ class ATCTTopicAudioProvider(object):
                 files.append(adapted)
 
         return files
+
 
 @interface.implementer(interfaces.IAudio)
 @component.adapter(atctifaces.IATFile)
@@ -162,16 +174,92 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
 
+class _ATCTFolderishAudioContainer(audioanno.AnnotationAudioContainer):
+    """An IAudioContainer adapter designed to handle ATCT based file content.
+    """
+
+    interface.implements(interfaces.IAudioContainer)
+    component.adapts(atctifaces.IATFolder)
+
+    ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFolderAudioContainer'
+
+
+    @property
+    def _default_charset(self):
+        """The charset determined by the active Plone site to be the
+        default.
+        """
+
+        charset = getattr(self, '__cached_default_charset', None)
+        if charset is not None:
+            return charset
+        try:
+            props = cmfutils.getToolByName(self.context, 'portal_properties')
+            self.__cached_default_charset = props.site_properties.default_charset
+        except:
+            self.__cached_default_charset = DEFAULT_CHARSET
+        return self.__cached_default_charset
+
+    def _u(self, v):
+        """Return the unicode object representing the value passed in an
+        as error-immune manner as possible.
+        """
+
+        return utils.unicodestr(v, self._default_charset)
+
+    def _get_audio_image(self):
+        v = self.audio_data.get('audio_image', None)
+        if v == None or v.get_size() == 0:
+            return None
+        return v
+    def _set_audio_image(self, v):
+        if v == interfaces.IAudioContainer['audio_image'].missing_value:
+            return
+        upload = v
+        if isinstance(upload, ofsimage.Image):
+            image = upload
+        else:
+            image = ofsimage.Image(id=upload.filename, 
+                                   title=upload.filename, 
+                                   file=upload)
+        self.audio_data['audio_image'] = image
+    audio_image = property(_get_audio_image, _set_audio_image)
+
+    def __str__(self):
+        return '<p4a.audio ATCTFolderishAudio title=%s>' % self.title
+    __repr__ = __str__
+
+@interface.implementer(interfaces.IAudioContainer)
+@component.adapter(atctifaces.IATFolder)
+def ATCTFolderAudioContainer(context):
+    if not interfaces.IAudioContainerEnhanced.providedBy(context):
+        return None
+    return _ATCTFolderishAudioContainer(context)
+
+@interface.implementer(interfaces.IAudioContainer)
+@component.adapter(atctifaces.IATTopic)
+def ATCTTopicAudioContainer(context):
+    if not interfaces.IAudioContainerEnhanced.providedBy(context):
+        return None
+    return _ATCTFolderishAudioContainer(context)
+
+@interface.implementer(interfaces.IAudioContainer)
+@component.adapter(atctifaces.IATBTreeFolder)
+def ATCTBTreeFolderAudioContainer(context):
+    if not interfaces.IAudioContainerEnhanced.providedBy(context):
+        return None
+    return _ATCTFolderishAudioContainer(context)
+
 def load_metadata(obj, evt):
     """An event handler for loading metadata.
     """
-    
+
     obj._load_audio_metadata()
 
 def sync_audio_metadata(obj, evt):
     """An event handler for saving id3 tag information back onto the file.
     """
-    
+
     audio = interfaces.IAudio(obj)
     for description in evt.descriptions:
         if isinstance(description, objectevent.Attributes):
@@ -193,7 +281,7 @@ def attempt_media_activation(obj, evt):
     view = obj.restrictedTraverse('@@media-config.html')
     if view.media_activated:
         return
-    
+
     mime_type = obj.get_content_type()
     try:
         accessor = component.getAdapter(obj, 
@@ -210,22 +298,33 @@ def attempt_media_activation(obj, evt):
 def update_dublincore(obj, evt):
     """Update the dublincore properties.
     """
-    
+
     audio = interfaces.IAudio(obj)
     obj.setTitle(audio.title)
-    desc = ''
-    fields = [(x, interfaces.IAudio[x])
-               for x in interfaces.IAudio if x != 'title']
-    for name, field in fields:
-        if isinstance(field, p4afile.FileField):
-            continue
-        value = getattr(audio, name) or None
-        if value is not None:
-            desc += u'%s is %s\n' % (field.title, unicode(value))
-    obj.setDescription(desc)
 
 def update_catalog(obj, evt):
     """Reindex the object in the catalog.
     """
 
     obj.reindexObject()
+    
+def SearchableText(obj, portal, **kwargs):
+    """ Used by the catalog for basic full text indexing """
+    
+    adapter = queryAdapter(obj, interfaces.IAudio)
+
+    if adapter:
+        if GENRE_VOCABULARY.hasTerm(adapter.genre):
+            genre = GENRE_VOCABULARY.getTerm(adapter.genre).title
+        else:
+            genre = ''
+        return_list = [obj.SearchableText(),
+                       adapter.artist,
+                       genre]
+        return ' '.join(return_list)
+    else:
+        return obj.SearchableText()
+    
+registerIndexableAttribute('SearchableText', SearchableText)
+
+    

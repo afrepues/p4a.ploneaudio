@@ -39,10 +39,7 @@ class ATAudioMigratable(object):
         
         os.remove(tempfilename)
         
-        try:
-            evt = objectevent.ObjectModifiedEvent(file)
-            event.notify(evt)
-        except:
-            import pdb; pdb.set_trace()
+        evt = objectevent.ObjectModifiedEvent(file)
+        event.notify(evt)
 
         return True

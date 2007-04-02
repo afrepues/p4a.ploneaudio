@@ -1,3 +1,5 @@
+import p4a.ploneaudio.sitesetup
+
 def has_fatsyndication_support():
     try:
         import Products.fatsyndication

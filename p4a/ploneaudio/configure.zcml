@@ -19,8 +19,15 @@
   </class>
 
   <adapter factory=".atct.ATCTFileAudio" />
+
+  <adapter factory=".atct.ATCTFolderAudioContainer" />
   <adapter factory=".atct.ATCTFolderAudioProvider" />
+
   <adapter factory=".atct.ATCTTopicAudioProvider" />
+  <adapter factory=".atct.ATCTTopicAudioContainer" />
+
+  <adapter factory=".atct.ATCTBTreeFolderAudioProvider" />
+  <adapter factory=".atct.ATCTBTreeFolderAudioContainer" />
 
   <subscriber
       for="p4a.audio.interfaces.IAudioEnhanced
@@ -31,6 +38,12 @@
   <subscriber
       for="p4a.audio.interfaces.IPossibleAudio
            zope.app.event.interfaces.IObjectCreatedEvent"
+      handler=".atct.attempt_media_activation"
+      />
+
+  <subscriber
+      for="p4a.audio.interfaces.IPossibleAudio
+           zope.app.container.interfaces.IObjectAddedEvent"
       handler=".atct.attempt_media_activation"
       />
 
