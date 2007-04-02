@@ -1,4 +1,5 @@
 from p4a import ploneaudio
+from p4a.ploneaudio import sitesetup
 from Products.PloneTestCase import PloneTestCase
 from zope.app.component import hooks
 
@@ -39,6 +40,8 @@ class IntegrationTestCase(PloneTestCase.PloneTestCase):
         zcml.load_config('configure.zcml', p4a.ploneaudio)
         zcml.load_config('configure.zcml', p4a.fileimage)
         hooks.setHooks()
+
+        sitesetup.setup_portal(self.portal)
 
 def testclass_builder(**kwargs):   
     class GeneratedIntegrationTestCase(IntegrationTestCase):
