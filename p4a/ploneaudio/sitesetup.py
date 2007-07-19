@@ -1,6 +1,7 @@
 from p4a.audio import interfaces
 from p4a.ploneaudio import content
 from p4a.common import site
+from p4a.z2utils import indexing
 
 from StringIO import StringIO
 
@@ -71,6 +72,8 @@ def setup_indexes(portal):
     
     out = StringIO()
     pc = getToolByName(portal, 'portal_catalog')
+
+    indexing.ensure_object_provides(portal)
 
     if not 'audio_genre_id' in pc.indexes():
         pc.addIndex('audio_genre_id', 'FieldIndex')
