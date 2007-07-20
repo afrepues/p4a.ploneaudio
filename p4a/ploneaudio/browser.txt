@@ -229,14 +229,42 @@ Finally save the form and close the file.
     >>> browser.getControl(name='form_submit').click()
     >>> ogg.close()
 
-Since we have uploaded ogg file we should get all meta info
-
+Test if there is an Artist
     >>> 'Rocky Burt' in browser.contents
     True
 
+Test if there is a Title
     >>> 'Emergencies All Around Us' in browser.contents
     True
 
+Test if there is a Year.
+    >>> '2007' in browser.contents
+    True
+
+Test if there is a track number (TRACKNUMBER)
+    >>> '01' in browser.contents
+    True
+
+The following tests are not working yet, because we need to add support for this metadata.
+
+Test if there is a track total (TRACKTOTAL)
+     '10' in browser.contents
+    True
+
+Test if there is a Comment (Ogg calls this DESCRIPTION)
+    'Coming to you live from Gander, Newfoundland.' in browser.contents
+    True
+    
+Test if there is a Genre
+    'Vocal' in browser.contents
+    True
+
+Test if there is a Composer
+    'Nate Aune' in browser.contents
+    True
+
+
+Test if there is the file metadata.
     >>> '60.5 kB' in browser.contents
     True
 
@@ -267,6 +295,7 @@ And check if we get actual data
 
     >>> 'First MP3 file with image' in browser.contents
     True
+
 
 Finally we should be able to open the file again
 
