@@ -39,9 +39,6 @@ class ATCTFolderAudioProvider(object):
 class ATCTBTreeFolderAudioProvider(ATCTFolderAudioProvider):
     interface.implements(interfaces.IAudioProvider)
     component.adapts(atctifaces.IATBTreeFolder)
-    
-    def __init__(self, context):
-        self.context = context
 
 class ATCTTopicAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
@@ -314,7 +311,7 @@ def SearchableText(obj, portal, **kwargs):
     adapter = queryAdapter(obj, interfaces.IAudio)
 
     if adapter:
-        if GENRE_VOCABULARY.hasTerm(adapter.genre):
+        if adapter.genre in GENRE_VOCABULARY:
             genre = GENRE_VOCABULARY.getTerm(adapter.genre).title
         else:
             genre = ''
@@ -326,5 +323,3 @@ def SearchableText(obj, portal, **kwargs):
         return obj.SearchableText()
     
 registerIndexableAttribute('SearchableText', SearchableText)
-
-    

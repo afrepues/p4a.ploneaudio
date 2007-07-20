@@ -1,10 +1,9 @@
 import os
 import unittest
 import doctest
-from zope.testing import doctestunit
 from p4a import ploneaudio
 import p4a.audio.tests
-from p4a.ploneaudio import testing
+from p4a.ploneaudio.tests import testing
 from Testing.ZopeTestCase.zopedoctest import ZopeDocFileSuite
 from Testing.ZopeTestCase import FunctionalDocFileSuite
 from App import Common
@@ -12,10 +11,8 @@ from Products.PloneTestCase import layer
 
 def test_suite():
     suite = unittest.TestSuite()
-    if __name__ not in ('__main__', 'p4a.ploneaudio.tests'):
+    if __name__ not in ('__main__', 'p4a.ploneaudio.tests.test_functional'):
         return suite
-    
-    suite.addTest(doctestunit.DocTestSuite('p4a.ploneaudio.atct'))
     
     if ploneaudio.has_ataudio_support():
         from p4a.ploneaudio.ataudio import ataudiotests

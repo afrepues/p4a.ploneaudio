@@ -1,0 +1,99 @@
+ATContentTypes Support
+======================
+
+Ensure that the adapters for various ATCT based content types are in working
+order.
+
+Setup
+-----
+
+First we create some mock classes for testing content.
+
+    >>> from Products.ATContentTypes.content import folder, file, topic
+    >>> from p4a.audio import interfaces
+    >>> from zope import interface
+
+    >>> class MockPortalTypes:
+    ...     def listContentTypes(self): return []
+    ...     def getTypeInfo(self, portal_type): return None
+
+    >>> class MockCatalog:
+    ...     def registerObject(self, ob): pass
+    ...     def catalog_object(self, *args, **kwargs): pass
+
+    >>> class MockPortal:
+    ...     def getPhysicalPath(self): return ['/']
+
+    >>> class MockPortalTool:
+    ...     portal = MockPortal()
+    ...     def getPortalObject(self): return self.portal
+
+    >>> class MockFolder(folder.ATFolder):
+    ...     portal_types = MockPortalTypes()
+    ...     reference_catalog = MockCatalog()
+    ...     uid_catalog = MockCatalog()
+    ...     uid_catalog.reference_catalog = reference_catalog
+    ...     portal_url = MockPortalTool()
+    ...     def getFolderContents(self, *args, **kwargs):
+    ...         return self.objectValues()
+
+    >>> class MockTopic(topic.ATTopic, MockFolder):
+    ...     def queryCatalog(self, **kwargs):
+    ...         return self.objectValues()
+
+Many of our classes use adapters to handle their logic so we need to setup
+a few of the adapters as well.
+
+    >>> from zope import component
+    >>> from p4a.ploneaudio import atct
+    >>> from Products.ATContentTypes import interface as atctifaces  
+    >>> component.provideAdapter(atct.ATCTFileAudio)
+
+    >>> from zope.app.annotation.interfaces import IAttributeAnnotatable
+    >>> from zope.app.annotation.attribute import AttributeAnnotations
+    >>> component.provideAdapter(AttributeAnnotations)
+
+Next we setup some mock folder content that we can test with.
+
+    >>> testfolder = MockFolder('testfolder')
+    >>> file1 = file.ATFile('file1')
+    >>> interface.alsoProvides(file1, atctifaces.IATFile,
+    ...                        IAttributeAnnotatable)
+
+Since our file instance still doesn't provide IAudioEnhanced the
+adapter lookup will return None.
+
+    >>> atct.ATCTFileAudio(file1) is None
+    True
+
+Now we audio enhance it and do a query of the audio items.
+
+    >>> interface.alsoProvides(file1, interfaces.IAudioEnhanced)
+
+    >>> newid = testfolder._setObject(file1.getId(), file1)
+    >>> provider = atct.ATCTFolderAudioProvider(testfolder)
+    >>> provider.audio_items
+    [<p4a.audio ATCTFileAudio title=None>]
+
+And now we setup some mock smart folder (topic) content that we can test
+with.
+
+    >>> testtopic = MockTopic('testtopic')
+    >>> newid = testtopic._setObject(file1.getId(), file1)
+
+    >>> provider = atct.ATCTTopicAudioProvider(testtopic)
+    >>> provider.audio_items
+    [<p4a.audio ATCTFileAudio title=None>]
+
+
+Catalog Indexing
+----------------
+
+We need to provide our own SearchableText index for getting in the audio
+enhanced content for searching.
+
+    >>> audio = IAudio(file1)
+    >>> audio.artist = 'foo'
+    >>> audio.genre = 4
+    >>> file1.SearchableText = lambda: 'hello world'
+    >>> atct.SearchableText(file1, None)
