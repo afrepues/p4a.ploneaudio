@@ -3,6 +3,7 @@ import unittest
 import doctest
 from zope.testing import doctestunit
 from p4a import ploneaudio
+import p4a.audio.tests
 from p4a.ploneaudio import testing
 from Testing.ZopeTestCase.zopedoctest import ZopeDocFileSuite
 from Testing.ZopeTestCase import FunctionalDocFileSuite
