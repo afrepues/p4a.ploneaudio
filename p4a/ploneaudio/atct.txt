@@ -92,8 +92,9 @@ Catalog Indexing
 We need to provide our own SearchableText index for getting in the audio
 enhanced content for searching.
 
-    >>> audio = IAudio(file1)
-    >>> audio.artist = 'foo'
+    >>> audio = atct.ATCTFileAudio(file1)
+    >>> audio.artist = u'foo'
     >>> audio.genre = 4
     >>> file1.SearchableText = lambda: 'hello world'
     >>> atct.SearchableText(file1, None)
+    u'hello world foo Disco'
