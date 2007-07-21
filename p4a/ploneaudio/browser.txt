@@ -339,6 +339,41 @@ Now check file's title and comment
     >>> 'XARadio - 12spora útvarp' in browser.contents
     True
 
+File with invalid genre: issue #38
+==================================
+
+If an MP3 file has an invalid genre, it should be handled gracefully.
+
+We assume that album folder is created and audio activated.
+First we need to open folder view
+
+    >>> browser.open(portal_url + '/test-audio-album')
+
+Then we need to create and upload mp3 file.
+
+    >>> dummy_genre = open(os.path.join(samplesdir, 'test-full-dummy-genre.mp3'))
+
+Then we need to upload in to the form
+
+    >>> browser.getLink('File').click()
+    >>> browser.getControl(name='title').value = 'Test Dummy Genre File'
+    >>> browser.getControl(name='description').value = 'Test description'
+
+    >>> upload_control = browser.getControl(name='file_file')
+    >>> upload_file = upload_control.mech_control
+    >>> upload_file.add_file(dummy_genre,filename='test-full-dummy-genre.mp3')
+
+Finally save the form and close the file.
+
+    >>> browser.getControl(name='form_submit').click()
+    >>> dummy_genre.close()
+
+Now check file's genre to make sure that it is empty.
+
+    >>> '<dd class="genre"></dd>' in browser.contents
+    True
+
+
 BTreeFolder Support
 ===================
 
