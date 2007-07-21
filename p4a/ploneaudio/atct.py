@@ -69,7 +69,7 @@ def ATCTFileAudio(context):
 class _ATCTFileAudio(audioanno.AnnotationAudio):
     """An IAudio adapter designed to handle ATCT based file content.
     """
-    
+
     interface.implements(interfaces.IAudio)
     component.adapts(atctifaces.IATFile)
 
@@ -79,13 +79,14 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         """Retrieve audio metadata from the raw file data and update
         this object's appropriate metadata fields.
         """
-        
+
         mime_type = self.context.get_content_type()
         accessor = component.queryAdapter(self.context, 
                                           interfaces.IAudioDataAccessor,
                                           unicode(mime_type))
         if accessor is not None:
-            filename = fileutils.write_ofsfile_to_tempfile(self.context.getRawFile())
+            filename = fileutils.write_ofsfile_to_tempfile \
+                       (self.context.getRawFile())
             accessor.load(filename)
             os.remove(filename)
 
@@ -93,13 +94,14 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         """Write the audio metadata fields of this object as metadata
         on the raw file data.
         """
-        
+
         mime_type = self.context.get_content_type()
         accessor = component.queryAdapter(self.context, 
                                           interfaces.IAudioDataAccessor,
                                           unicode(mime_type))
         if accessor is not None:
-            filename = fileutils.write_ofsfile_to_tempfile(self.context.getRawFile())
+            filename = fileutils.write_ofsfile_to_tempfile \
+                       (self.context.getRawFile())
             accessor.store(filename)
 
             zodb_file = self.context.getRawFile()
@@ -109,7 +111,7 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
             data, size = zodb_file._read_data(fin)
             zodb_file.update_data(data, mime_type, size)
             fin.close()
-            
+
             os.remove(filename)
 
     @property
@@ -117,22 +119,23 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         """The charset determined by the active Plone site to be the
         default.
         """
-        
+
         charset = getattr(self, '__cached_default_charset', None)
         if charset is not None:
             return charset
         try:
             props = cmfutils.getToolByName(self.context, 'portal_properties')
-            self.__cached_default_charset = props.site_properties.default_charset
+            self.__cached_default_charset = \
+                                          props.site_properties.default_charset
         except:
             self.__cached_default_charset = DEFAULT_CHARSET
         return self.__cached_default_charset
-        
+
     def _u(self, v):
         """Return the unicode object representing the value passed in an
         as error-immune manner as possible.
         """
-        
+
         return utils.unicodestr(v, self._default_charset)
 
     def _get_file(self):

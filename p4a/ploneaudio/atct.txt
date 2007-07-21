@@ -85,6 +85,39 @@ with.
     >>> provider.audio_items
     [<p4a.audio ATCTFileAudio title=None>]
 
+Loading and Storing Metadata
+----------------------------
+
+First we need to make sure a mock data accessor adapter is available.
+
+    >>> files_loaded = []
+    >>> files_stored = []
+    >>> class MockDataAccessor(object):
+    ...     def __init__(self, context): self.context = context
+    ...     def load(self, filename): files_loaded.append(filename)
+    ...     def store(self, filename): files_stored.append(filename)
+
+    >>> component.provideAdapter(MockDataAccessor,
+    ...                          provides=interfaces.IAudioDataAccessor,
+    ...                          adapts=(interface.Interface,),
+    ...                          name=u'text/plain')
+
+Next we instruct the audio item to load it's audio metdata.
+
+    >>> audio = atct.ATCTFileAudio(file1)
+    >>> audio._load_audio_metadata()
+    >>> len(files_loaded)
+    1
+
+And then we need the audio item to save it's audio metadata back.
+
+    >>> component.provideAdapter(MockDataAccessor,
+    ...                          provides=interfaces.IAudioDataAccessor,
+    ...                          adapts=(interface.Interface,),
+    ...                          name=u'application/octet-stream')
+    >>> audio._save_audio_metadata()
+    >>> len(files_stored)
+    1
 
 Catalog Indexing
 ----------------
