@@ -4,11 +4,8 @@ from Products.PloneTestCase import PloneTestCase
 from zope.app.component import hooks
 
 DEPENDENCIES = ['CMFonFive', 'Archetypes']
-try:
-    import Products.ATAudio
+if ploneaudio.has_ataudio_support():
     DEPENDENCIES.append('ATAudio')
-except ImportError, e:
-    pass
 
 PRODUCT_DEPENDENCIES = ['MimetypesRegistry', 'PortalTransforms']
 
@@ -29,12 +26,14 @@ from Products.Five import zcml
 import p4a.common
 import p4a.audio
 import p4a.ploneaudio
+import plone.app.form
 
 class IntegrationTestCase(PloneTestCase.PloneTestCase):
     """Plone based integration test for p4a.ploneaudio."""
 
     def _setup(self):
         PloneTestCase.PloneTestCase._setup(self)
+        zcml.load_config('configure.zcml', plone.app.form)
         zcml.load_config('configure.zcml', p4a.common)
         zcml.load_config('configure.zcml', p4a.audio)
         zcml.load_config('configure.zcml', p4a.ploneaudio)
@@ -43,7 +42,7 @@ class IntegrationTestCase(PloneTestCase.PloneTestCase):
 
         sitesetup.setup_portal(self.portal)
 
-def testclass_builder(**kwargs):   
+def testclass_builder(**kwargs):
     class GeneratedIntegrationTestCase(IntegrationTestCase):
         """Generated integration TestCase for p4a.ploneaudio."""
 
