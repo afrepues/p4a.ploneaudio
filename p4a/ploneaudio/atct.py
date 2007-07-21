@@ -1,4 +1,5 @@
 import os
+import Acquisition
 from OFS import Image as ofsimage
 
 from zope import component
@@ -321,5 +322,13 @@ def SearchableText(obj, portal, **kwargs):
         return ' '.join(return_list)
     else:
         return obj.SearchableText()
-    
+
 registerIndexableAttribute('SearchableText', SearchableText)
+
+def feature_activated(evt):
+    if evt.enhancedinterface is interfaces.IAudioContainerEnhanced:
+        # we want to remove any dynamic view fti layout that was set so our
+        # audio view is displayed properly
+        obj = Acquisition.aq_base(evt.object)
+        if hasattr(obj, 'layout'):
+            del obj.layout

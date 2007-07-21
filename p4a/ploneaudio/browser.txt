@@ -43,7 +43,7 @@ At this point we're inside an empty smart folder.  The first test here is to
 Since the album/smart-folder is currently empty, the total length amount should
 be zero.
 
-    >>> '00:00' in browser.contents
+    >>> 'Audio information unavailable' in browser.contents
     True
 
 Audio Folders
@@ -64,7 +64,7 @@ At this point we're inside an empty folder.  The first test here is to
 Since the album/folder is currently empty, the total length amount should
 be zero.
 
-    >>> '00:00' in browser.contents
+    >>> 'Audio information unavailable' in browser.contents
     True
 
 Since we have a folder we will add new mp3 file. First create file object:
@@ -415,11 +415,6 @@ Now we audio-activate the folder again. The new default audio-view should be
     >>> music_folder.getLayout()
     'audio-container.html'
 
-Due to bug #20 this is not the case, so we need to set it explicitly to the
-default audio-view.
-
-    >>> browser.getLink('Audio view').click()
-
 This will change the layout-attribute on the folder to 'audio-container.html'.
 
     >>> music_folder.getLayout()
@@ -434,19 +429,3 @@ This will change the layout-attribute on the folder to 'audio-container.html'.
 Now we audio-deactivate it again.
 
     >>> browser.getLink('Deactivate Audio').click()
-    Traceback (most recent call last):
-    ...
-    HTTPError: HTTP Error 404: Not Found
-
-Due to bug#20 this gives a 404-error because the layout-attribute on the folder
-is still referring to 'audio-container.html', which is no longer available.
-
-    >>> 'audio-container.html' in music_folder.getLayout()
-    False
-
-The layout set on a folder should always be listed in the getAvailableLayout()
-    >>> music_folder.getLayout() in [ x[1] for x in music_folder.getAvailableLayouts()]
-    True
-
-
-

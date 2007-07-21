@@ -71,6 +71,11 @@
       handler=".atct.load_metadata"
       />
 
+  <subscriber
+      for="p4a.common.interfaces.IFeatureActivatedEvent"
+      handler=".atct.feature_activated"
+      />
+
   <include 
       package=".ataudio" 
       zcml:condition="installed Products.ATAudio"
