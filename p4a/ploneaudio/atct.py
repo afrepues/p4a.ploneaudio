@@ -20,6 +20,8 @@ from Products.CMFPlone.CatalogTool import registerIndexableAttribute
 
 from zope.component import queryAdapter
 
+DEFAULT_CHARSET = 'utf-8'
+
 class ATCTFolderAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
     component.adapts(atctifaces.IATFolder)
@@ -58,6 +60,30 @@ class ATCTTopicAudioProvider(object):
 
         return files
 
+class I18NMixin(object):
+    @property
+    def _default_charset(self):
+        """The charset determined by the active Plone site to be the
+        default.
+        """
+
+        charset = getattr(self, '_cached_default_charset', None)
+        if charset is not None:
+            return charset
+        try:
+            props = cmfutils.getToolByName(self.context, 'portal_properties')
+            self._cached_default_charset = \
+                                         props.site_properties.default_charset
+        except:
+            self._cached_default_charset = DEFAULT_CHARSET
+        return self._cached_default_charset
+
+    def _u(self, v):
+        """Return the unicode object representing the value passed in an
+        as error-immune manner as possible.
+        """
+
+        return utils.unicodestr(v, self._default_charset)
 
 @interface.implementer(interfaces.IAudio)
 @component.adapter(atctifaces.IATFile)
@@ -66,7 +92,7 @@ def ATCTFileAudio(context):
         return None
     return _ATCTFileAudio(context)
 
-class _ATCTFileAudio(audioanno.AnnotationAudio):
+class _ATCTFileAudio(audioanno.AnnotationAudio, I18NMixin):
     """An IAudio adapter designed to handle ATCT based file content.
     """
 
@@ -114,30 +140,6 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
 
             os.remove(filename)
 
-    @property
-    def _default_charset(self):
-        """The charset determined by the active Plone site to be the
-        default.
-        """
-
-        charset = getattr(self, '__cached_default_charset', None)
-        if charset is not None:
-            return charset
-        try:
-            props = cmfutils.getToolByName(self.context, 'portal_properties')
-            self.__cached_default_charset = \
-                                          props.site_properties.default_charset
-        except:
-            self.__cached_default_charset = DEFAULT_CHARSET
-        return self.__cached_default_charset
-
-    def _u(self, v):
-        """Return the unicode object representing the value passed in an
-        as error-immune manner as possible.
-        """
-
-        return utils.unicodestr(v, self._default_charset)
-
     def _get_file(self):
         return self.context.getRawFile()
     def _set_file(self, v):
@@ -175,7 +177,8 @@ class _ATCTFileAudio(audioanno.AnnotationAudio):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
 
-class _ATCTFolderishAudioContainer(audioanno.AnnotationAudioContainer):
+class _ATCTFolderishAudioContainer(audioanno.AnnotationAudioContainer,
+                                   I18NMixin):
     """An IAudioContainer adapter designed to handle ATCT based file content.
     """
 
@@ -183,30 +186,6 @@ class _ATCTFolderishAudioContainer(audioanno.AnnotationAudioContainer):
     component.adapts(atctifaces.IATFolder)
 
     ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFolderAudioContainer'
-
-
-    @property
-    def _default_charset(self):
-        """The charset determined by the active Plone site to be the
-        default.
-        """
-
-        charset = getattr(self, '__cached_default_charset', None)
-        if charset is not None:
-            return charset
-        try:
-            props = cmfutils.getToolByName(self.context, 'portal_properties')
-            self.__cached_default_charset = props.site_properties.default_charset
-        except:
-            self.__cached_default_charset = DEFAULT_CHARSET
-        return self.__cached_default_charset
-
-    def _u(self, v):
-        """Return the unicode object representing the value passed in an
-        as error-immune manner as possible.
-        """
-
-        return utils.unicodestr(v, self._default_charset)
 
     def _get_audio_image(self):
         v = self.audio_data.get('audio_image', None)

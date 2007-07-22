@@ -119,6 +119,60 @@ And then we need the audio item to save it's audio metadata back.
     >>> len(files_stored)
     1
 
+DataAccessor I18N Convenience Functionality
+-------------------------------------------
+
+Ensure the default charset can be retrieved on the previous adapter.  First
+we'll make sure it gets whatever the DEFAULT_CHARSET constant is set at.
+
+    >>> audio._default_charset == atct.DEFAULT_CHARSET
+    True
+
+Now we setup the charset as it gets retrieved via Plone.
+
+    >>> class MockProperties: pass
+    >>> propstool = MockProperties()
+    >>> propstool.site_properties = MockProperties()
+    >>> propstool.site_properties.default_charset = 'foobar'
+    >>> audio.context.portal_properties = propstool
+
+Due to the fact that the charset will have already been cached, we need
+to manually remove the cache value and try.
+
+    >>> del audio._cached_default_charset
+    >>> audio._default_charset
+    'foobar'
+
+And now we try once more to make sure the caching worked (we delete
+the tool so if caching wasn't working we would get DEFAULT_CHARSET).
+
+    >>> del audio.context.portal_properties
+    >>> audio._default_charset
+    'foobar'
+
+And of course we make a simple _u() call (need to delete the cached charset
+first or else it'll try decoding using the 'foobar' charset).
+
+    >>> del audio._cached_default_charset
+    >>> audio._u('foo')
+    u'foo'
+
+Misc DataAccessor Stuff
+-----------------------
+
+Make sure setting and getting the file attribute works properly (uses
+properties at the moment).
+
+    >>> audio.file
+    <File at file1/file>
+
+When we set the file directly it actually issues an upload command so
+the string value becomes the file object value.
+
+    >>> audio.file = 'foo'
+    >>> audio.file
+    <File at file1/file>
+
 Catalog Indexing
 ----------------
 
