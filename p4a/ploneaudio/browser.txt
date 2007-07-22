@@ -370,7 +370,7 @@ Finally save the form and close the file.
 
 Now check file's genre to make sure that it is empty.
 
-    >>> '<dd class="genre"></dd>' in browser.contents
+    >>> '<dd class="audio-genre"></dd>' in browser.contents
     True
 
 
