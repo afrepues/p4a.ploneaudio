@@ -35,17 +35,17 @@ registerIndexableAttribute('audio_genre_id', audio_genre_id)
 def SearchableText(obj, portal, **kwargs):
     """ Used by the catalog for basic full text indexing """
 
-    adapted = interfaces.IAudio(obj, None)
+    audiofile = interfaces.IAudio(obj, None)
 
-    if adapted is not None:
-        if adapted.genre in GENRE_VOCABULARY:
-            genre = GENRE_VOCABULARY.getTerm(adapted.genre).title
+    if audiofile is not None:
+        if audiofile.genre in GENRE_VOCABULARY:
+            genre = GENRE_VOCABULARY.getTerm(audiofile.genre).title
         else:
             genre = ''
         return_list = [obj.SearchableText(),
-                       adapted.artist,
+                       audiofile.artist,
                        genre]
-        return ' '.join(return_list)
+        return u' '.join([x.strip() for x in return_list if x])
     else:
         return obj.SearchableText()
 
