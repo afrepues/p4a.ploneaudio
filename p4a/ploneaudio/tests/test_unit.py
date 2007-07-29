@@ -19,5 +19,8 @@ def test_suite():
     suite.addTest(doctestunit.DocFileSuite('indexing.txt',
                                            package='p4a.ploneaudio',
                                            optionflags=doctest.ELLIPSIS))
+    suite.addTest(doctestunit.DocFileSuite('sitesetup.txt',
+                                           package='p4a.ploneaudio',
+                                           optionflags=doctest.ELLIPSIS))
 
     return suite

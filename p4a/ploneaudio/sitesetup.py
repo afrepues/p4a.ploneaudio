@@ -14,7 +14,7 @@ def setup_portal(portal):
     setup_site(portal)
     setup_indexes(portal)
     setup_metadata(portal)
-    addSmartFolderIndexAndMetadata(portal)
+    setup_smart_folder_indexes(portal)
 
     qi = getToolByName(portal, 'portal_quickinstaller')
     qi.installProducts(['CMFonFive'])
@@ -23,19 +23,8 @@ def setup_site(site):
     """Install all necessary components and configuration into the
     given site.
 
-      >>> from p4a.audio import interfaces
-      >>> from p4a.common.testing import MockSite
-
-      >>> site = MockSite()
-      >>> site.queryUtility(interfaces.IAudioSupport) is None
-      True
-
-      >>> setup_site(site)
-      >>> site.getUtility(interfaces.IAudioSupport)
-      <AudioSupport ...>
-
     """
-    
+
     sm = site.getSiteManager()
     if not sm.queryUtility(interfaces.IAudioSupport):
         sm.registerUtility(interfaces.IAudioSupport,
@@ -43,8 +32,10 @@ def setup_site(site):
 
 def setup_indexes(portal):
     """Install specific indexes for the audio metadata fields
-    so they are searchable."""
-    
+    so they are searchable.
+
+    """
+
     out = StringIO()
     pc = getToolByName(portal, 'portal_catalog')
 
@@ -59,7 +50,7 @@ def setup_indexes(portal):
 
         extra = SimpleRecord(lexicon_id='plaintext_lexicon',
                              index_type='Okapi BM25 Rank')
-        
+
         pc.addIndex('audio_artist', 'ZCTextIndex', extra)
         pc.manage_reindexIndex('audio_artist')
         print >>out, 'The ZCTextIndex "audio_artist" was successfully created'
@@ -68,12 +59,12 @@ def setup_indexes(portal):
         pc.addIndex('Format', 'FieldIndex')
         pc.manage_reindexIndex('Format')
         print >>out, 'The FieldIndex "Format" was successfully created'
-    
+
 def setup_metadata(portal):
     """Adds the specified columns to the catalog specified,
        which must inherit from CMFPlone.CatalogTool.CatalogTool, or otherwise
        use the Plone ExtensibleIndexableObjectWrapper."""
-       
+
     out = StringIO()
     pc = getToolByName(portal, 'portal_catalog', None)
 
@@ -83,23 +74,17 @@ def setup_metadata(portal):
         pass
 
     reindex = []
-        
+
     pc.manage_addColumn('audio_artist')
     reindex.append('audio_artist')
-    
+
     if reindex:
         pc.refreshCatalog()
-        
+
     print >>out, 'The metadata "audio_artist" was successfully added.'
 
 
-def setup_smartfolder_indexes(portal):
-    """Set up the smart folder indexes so that you can create smart folders
-    of the MP3s added to the site."""
-    
-    out = StringIO()
-            
-index_mapping = {'audio_artist':
+INDEX_MAPPING = {'audio_artist':
                     {'name': 'Artist name',
                      'description': 'The name of the artist.',
                      'enabled': True,
@@ -119,23 +104,19 @@ index_mapping = {'audio_artist':
                      'criteria': ('ATSimpleStringCriterion',)},
                  }
 
-def addSmartFolderIndexAndMetadata(portal,
-                                   indexes=('audio_artist',
-                                            'audio_genre_id',
-                                            'Format')):
+def setup_smart_folder_indexes(portal):
     """Adds the default indexes to be available from smartfolders"""
-    atct_config = getToolByName(portal, 'portal_atct', None)
-    if atct_config is not None:
-        for index in indexes:
-            index_info=index_mapping[index]
-            atct_config.updateIndex(index, friendlyName=index_info['name'],
-                                 description=index_info['description'],
-                                 enabled=index_info['enabled'],
-                                 criteria=index_info['criteria'])
-            atct_config.updateMetadata(index, friendlyName=index_info['name'],
-                                 description=index_info['description'],
-                                 enabled=True)
-                                     
+    atct_config = getToolByName(portal, 'portal_atct')
+
+    for index, index_info in INDEX_MAPPING.items():
+        atct_config.updateIndex(index, friendlyName=index_info['name'],
+                                description=index_info['description'],
+                                enabled=index_info['enabled'],
+                                criteria=index_info['criteria'])
+        atct_config.updateMetadata(index, friendlyName=index_info['name'],
+                                   description=index_info['description'],
+                                   enabled=True)
+
 def _cleanup_utilities(site):
     raise NotImplementedError('Current ISiteManager support does not '
                               'include ability to clean up')
