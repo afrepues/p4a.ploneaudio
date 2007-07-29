@@ -1,3 +1,4 @@
+import p4a.ploneaudio.indexing
 import p4a.ploneaudio.sitesetup
 
 def has_package(pkgstr):

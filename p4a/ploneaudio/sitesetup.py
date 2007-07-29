@@ -7,8 +7,6 @@ from StringIO import StringIO
 
 from Products.CMFCore.utils import getToolByName, SimpleRecord 
 
-from Products.CMFPlone.CatalogTool import registerIndexableAttribute
-from zope.component.exceptions import ComponentLookupError
 from p4a.audio.interfaces import IAudio
 
 def setup_portal(portal):
@@ -17,32 +15,9 @@ def setup_portal(portal):
     setup_indexes(portal)
     setup_metadata(portal)
     addSmartFolderIndexAndMetadata(portal)
-    
+
     qi = getToolByName(portal, 'portal_quickinstaller')
     qi.installProducts(['CMFonFive'])
-
-
-def audio_artist(object, portal, **kwargs):
-    """Return the name of the artist in the audio file for use in searching the catalog."""
-    try:
-        audiofile = IAudio(object)
-        return audiofile.artist
-    except (ComponentLookupError, TypeError, ValueError):
-        # The catalog expects AttributeErrors when a value can't be found
-        raise AttributeError
-
-registerIndexableAttribute('audio_artist', audio_artist)
-
-def audio_genre_id(object, portal, **kwargs):
-    """Return the genre id of the audio file for use in searching the catalog."""
-    try:
-        audiofile = IAudio(object)
-        return audiofile.genre
-    except (ComponentLookupError, TypeError, ValueError):
-        # The catalog expects AttributeErrors when a value can't be found
-        raise AttributeError
-
-registerIndexableAttribute('audio_genre_id', audio_genre_id)
 
 def setup_site(site):
     """Install all necessary components and configuration into the

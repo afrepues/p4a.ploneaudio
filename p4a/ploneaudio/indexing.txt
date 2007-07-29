@@ -1,0 +1,36 @@
+Indexing
+========
+
+We need to provide our own SearchableText index for getting in the audio
+enhanced content for searching.
+
+    >>> from p4a.ploneaudio import atct, indexing
+    >>> from p4a.audio import interfaces
+    >>> from zope import interface
+    >>> from Products.ATContentTypes.content import file
+    >>> from zope.app.annotation.attribute import AttributeAnnotations
+
+    >>> class MockFile(file.ATFile, AttributeAnnotations):
+    ...     interface.implements(interfaces.IAudio)
+    ...     genre = None
+    ...     artist = u''
+    ...     def __init__(self, id):
+    ...         file.ATFile.__init__(self, id)
+    ...         self.obj = self
+
+    >>> file1 = MockFile('file1')
+    >>> file1.SearchableText = lambda: 'hello world'
+    >>> indexing.SearchableText(file1, None)
+    u'hello world  '
+
+    >>> file1.genre = 4
+    >>> indexing.SearchableText(file1, None)
+    u'hello world  Disco'
+
+    >>> file3 = file.ATFile('file3')
+    >>> from Products.MimetypesRegistry.MimeTypesRegistry \
+    ...     import MimeTypesRegistry
+    >>> file3.mimetypes_registry = MimeTypesRegistry()
+    >>> indexing.SearchableText(file3, None)
+    'file3 '
+

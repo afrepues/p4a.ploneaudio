@@ -75,6 +75,22 @@ Now we audio enhance it and do a query of the audio items.
     >>> provider.audio_items
     [<p4a.audio ATCTFileAudio title=None>]
 
+We can also lookup audio information on this folder.  But since the folder
+hasn't been marked as ``IAudioContainerEnhanced`` lookup will return None.
+
+    >>> containeraudio = atct.ATCTFolderAudioContainer(testfolder)
+    >>> containeraudio is None
+    True
+
+So now we have to mark the interface.
+
+    >>> interface.alsoProvides(testfolder,
+    ...                        interfaces.IAudioContainerEnhanced,
+    ...                        IAttributeAnnotatable)
+    >>> containeraudio = atct.ATCTFolderAudioContainer(testfolder)
+    >>> containeraudio
+    <p4a.audio ATCTFolderishAudio title=>
+
 And now we setup some mock smart folder (topic) content that we can test
 with.
 
@@ -84,6 +100,33 @@ with.
     >>> provider = atct.ATCTTopicAudioProvider(testtopic)
     >>> provider.audio_items
     [<p4a.audio ATCTFileAudio title=None>]
+
+We can also lookup audio information on this smart folder.  But since the
+smart folder hasn't been marked as ``IAudioContainerEnhanced`` lookup will
+return None.
+
+    >>> containeraudio = atct.ATCTTopicAudioContainer(testtopic)
+    >>> containeraudio is None
+    True
+
+So now we have to mark the interface.
+
+    >>> interface.alsoProvides(testtopic,
+    ...                        interfaces.IAudioContainerEnhanced,
+    ...                        IAttributeAnnotatable)
+    >>> containeraudio = atct.ATCTTopicAudioContainer(testtopic)
+    >>> containeraudio
+    <p4a.audio ATCTFolderishAudio title=>
+
+One last content type we provide the audio container functionality for is
+the (disabled by default) ATCT btree folder.
+
+    >>> atct.ATCTBTreeFolderAudioContainer(None) is None
+    True
+
+    >>> containeraudio = atct.ATCTBTreeFolderAudioContainer(testfolder)
+    >>> containeraudio
+    <p4a.audio ATCTFolderishAudio title=>
 
 Loading and Storing Metadata
 ----------------------------
@@ -96,6 +139,7 @@ First we need to make sure a mock data accessor adapter is available.
     ...     def __init__(self, context): self.context = context
     ...     def load(self, filename): files_loaded.append(filename)
     ...     def store(self, filename): files_stored.append(filename)
+    ...     audio_type = 'mock_type'
 
     >>> component.provideAdapter(MockDataAccessor,
     ...                          provides=interfaces.IAudioDataAccessor,
@@ -118,6 +162,68 @@ And then we need the audio item to save it's audio metadata back.
     >>> audio._save_audio_metadata()
     >>> len(files_stored)
     1
+
+There is also an event handler for automatically kicking the loading of
+metadata.
+
+    >>> atct.load_metadata(audio, None)
+
+And when a file object changes there is a synchronization event handler
+that tries to make sure the content is sane.
+
+    >>> from zope.app.event import objectevent
+    >>> class MockEvent(object):
+    ...     descriptions = [objectevent.Attributes(interfaces.IAudio,
+    ...                                            'title', 'file')]
+    >>> atct.sync_audio_metadata(audio, MockEvent())
+    >>> 
+
+Attempting Media Activation
+---------------------------
+
+There is an event handler which tries to automatically activate media
+on modified objects.
+
+But first we need to setup a test request and register our view component.
+
+    >>> from zope.publisher.browser import TestRequest
+    >>> file1.REQUEST = TestRequest()
+
+    >>> from p4a.audio.browser import media
+    >>> component.provideAdapter(media.ToggleEnhancementsView,
+    ...                          adapts=(interface.Interface,
+    ...                                  TestRequest),
+    ...                          provides=interface.Interface,
+    ...                          name=u'media-config.html')
+
+    >>> view = media.ToggleEnhancementsView(file1, file1.REQUEST)
+    >>> view.media_activated
+    False
+
+Since it's false, lets go ahead and try doing activation.
+
+    >>> atct.attempt_media_activation(file1, None)
+
+At this point we've never made our file1 object provide IPossibleAudio
+so even though it's marked as IAudioEnhanced, the feature property checks
+for both.
+
+    >>> interface.alsoProvides(file1, interfaces.IPossibleAudio)
+    >>> view.media_activated
+    True
+
+Now we can try activation again.
+
+    >>> atct.attempt_media_activation(file1, None)
+
+And now we try to produce some error being raised within the adapter lookup
+call.
+
+    >>> file2 = file.ATFile('file2')
+    >>> file2.get_content_type = lambda: 'nadda'
+    >>> file2.REQUEST = file1.REQUEST
+    >>> interface.alsoProvides(file2, interfaces.IPossibleAudio)
+    >>> atct.attempt_media_activation(file2, None)
 
 DataAccessor I18N Convenience Functionality
 -------------------------------------------
@@ -173,15 +279,54 @@ the string value becomes the file object value.
     >>> audio.file
     <File at file1/file>
 
-Catalog Indexing
-----------------
+In it's starting condition, the ``audio_image`` field will have no value.
 
-We need to provide our own SearchableText index for getting in the audio
-enhanced content for searching.
+    >>> audio.audio_image is None
+    True
 
-    >>> audio = atct.ATCTFileAudio(file1)
-    >>> audio.artist = u'foo'
-    >>> audio.genre = 4
-    >>> file1.SearchableText = lambda: 'hello world'
-    >>> atct.SearchableText(file1, None)
-    u'hello world foo Disco'
+So we start by trying to set the value to a value we know will get ignored.
+
+    >>> audio.audio_image = interfaces.IAudio['audio_image'].missing_value
+    >>> audio.audio_image is None
+    True
+
+The image value can be of instance OFSImage.
+
+    >>> from OFS import Image as ofsimage
+    >>> audio.audio_image = ofsimage.Image('someid', 'sometitle', 'filecontent')
+    >>> audio.audio_image
+    <Image at someid>
+
+If it isn't of type OFSImage, the setter will automatically create
+one based on the value provided (the value is expected to be file-like).
+
+    >>> from StringIO import StringIO
+    >>> sio = StringIO('foo')
+    >>> sio.filename = 'nofilenameset'
+    >>> audio.audio_image = sio
+    >>> audio.audio_image
+    <Image at nofilenameset>
+
+And now we do a quick check to see what the ``audio_type`` is.
+
+    >>> audio.audio_type
+    'mock_type'
+
+Feature Event Handling
+----------------------
+
+Whenever a feature has been activated we have an event handler that
+listens.  It helps ensure that the audio container view is setup properly
+on a container that has had it's layout changed.
+
+    >>> from p4a.common.interfaces import FeatureActivatedEvent
+    >>> evt = FeatureActivatedEvent(interfaces.IAudioContainerEnhanced,
+    ...                             testfolder)
+    >>> hasattr(testfolder, 'layout')
+    False
+    >>> testfolder.layout = 'changed'
+    >>> hasattr(testfolder, 'layout')
+    True
+    >>> atct.feature_activated(evt)
+    >>> hasattr(testfolder, 'layout')
+    False

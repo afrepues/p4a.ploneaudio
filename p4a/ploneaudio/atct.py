@@ -9,7 +9,6 @@ from zope.app.event import objectevent
 from p4a.audio import audioanno
 from p4a.audio import interfaces
 from p4a.audio import utils
-from p4a.audio.genre import GENRE_VOCABULARY
 
 from p4a.fileimage import file as p4afile
 from p4a.fileimage import utils as fileutils
@@ -19,6 +18,9 @@ from Products.CMFCore import utils as cmfutils
 from Products.CMFPlone.CatalogTool import registerIndexableAttribute
 
 from zope.component import queryAdapter
+
+import logging
+logger = logging.getLogger('p4a.ploneaudio.atct')
 
 DEFAULT_CHARSET = 'utf-8'
 
@@ -92,9 +94,29 @@ def ATCTFileAudio(context):
         return None
     return _ATCTFileAudio(context)
 
-class _ATCTFileAudio(audioanno.AnnotationAudio, I18NMixin):
-    """An IAudio adapter designed to handle ATCT based file content.
-    """
+class ImageMixin(object):
+    """Supports image field setting and getting."""
+
+    def _get_audio_image(self):
+        v = self.audio_data.get('audio_image', None)
+        if v == None or v.get_size() == 0:
+            return None
+        return v
+    def _set_audio_image(self, v):
+        if v == interfaces.IAudio['audio_image'].missing_value:
+            return
+        upload = v
+        if isinstance(upload, ofsimage.Image):
+            image = upload
+        else:
+            image = ofsimage.Image(id=upload.filename, 
+                                   title=upload.filename, 
+                                   file=upload)
+        self.audio_data['audio_image'] = image
+    audio_image = property(_get_audio_image, _set_audio_image)
+
+class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
+    """An IAudio adapter designed to handle ATCT based file content."""
 
     interface.implements(interfaces.IAudio)
     component.adapts(atctifaces.IATFile)
@@ -147,24 +169,6 @@ class _ATCTFileAudio(audioanno.AnnotationAudio, I18NMixin):
             self.context.getRawFile().manage_upload(file=v)
     file = property(_get_file, _set_file)
 
-    def _get_audio_image(self):
-        v = self.audio_data.get('audio_image', None)
-        if v == None or v.get_size() == 0:
-            return None
-        return v
-    def _set_audio_image(self, v):
-        if v == interfaces.IAudio['audio_image'].missing_value:
-            return
-        upload = v
-        if isinstance(upload, ofsimage.Image):
-            image = upload
-        else:
-            image = ofsimage.Image(id=upload.filename, 
-                                   title=upload.filename, 
-                                   file=upload)
-        self.audio_data['audio_image'] = image
-    audio_image = property(_get_audio_image, _set_audio_image)
-
     @property
     def audio_type(self):
         mime_type = self.context.get_content_type()
@@ -177,7 +181,8 @@ class _ATCTFileAudio(audioanno.AnnotationAudio, I18NMixin):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
 
-class _ATCTFolderishAudioContainer(audioanno.AnnotationAudioContainer,
+class _ATCTFolderishAudioContainer(ImageMixin,
+                                   audioanno.AnnotationAudioContainer,
                                    I18NMixin):
     """An IAudioContainer adapter designed to handle ATCT based file content.
     """
@@ -186,24 +191,6 @@ class _ATCTFolderishAudioContainer(audioanno.AnnotationAudioContainer,
     component.adapts(atctifaces.IATFolder)
 
     ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFolderAudioContainer'
-
-    def _get_audio_image(self):
-        v = self.audio_data.get('audio_image', None)
-        if v == None or v.get_size() == 0:
-            return None
-        return v
-    def _set_audio_image(self, v):
-        if v == interfaces.IAudioContainer['audio_image'].missing_value:
-            return
-        upload = v
-        if isinstance(upload, ofsimage.Image):
-            image = upload
-        else:
-            image = ofsimage.Image(id=upload.filename, 
-                                   title=upload.filename, 
-                                   file=upload)
-        self.audio_data['audio_image'] = image
-    audio_image = property(_get_audio_image, _set_audio_image)
 
     def __str__(self):
         return '<p4a.audio ATCTFolderishAudio title=%s>' % self.title
@@ -258,7 +245,9 @@ def attempt_media_activation(obj, evt):
     """Try to activiate the media capabilities of the given object.
     """
 
-    view = obj.restrictedTraverse('@@media-config.html')
+    view = component.getMultiAdapter((obj, obj.REQUEST),
+                                     interface=interface.Interface,
+                                     name=u'media-config.html')
     if view.media_activated:
         return
 
@@ -268,6 +257,8 @@ def attempt_media_activation(obj, evt):
                                         interfaces.IAudioDataAccessor,
                                         unicode(mime_type))
     except Exception, e:
+        logger.warn("Media activation bypassed for object with mime "
+                    "type of '%s'" % mime_type)
         accessor = None
 
     if accessor is not None:
@@ -287,25 +278,6 @@ def update_catalog(obj, evt):
     """
 
     obj.reindexObject()
-    
-def SearchableText(obj, portal, **kwargs):
-    """ Used by the catalog for basic full text indexing """
-    
-    adapter = queryAdapter(obj, interfaces.IAudio)
-
-    if adapter:
-        if adapter.genre in GENRE_VOCABULARY:
-            genre = GENRE_VOCABULARY.getTerm(adapter.genre).title
-        else:
-            genre = ''
-        return_list = [obj.SearchableText(),
-                       adapter.artist,
-                       genre]
-        return ' '.join(return_list)
-    else:
-        return obj.SearchableText()
-
-registerIndexableAttribute('SearchableText', SearchableText)
 
 def feature_activated(evt):
     if evt.enhancedinterface is interfaces.IAudioContainerEnhanced:
