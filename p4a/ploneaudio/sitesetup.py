@@ -126,6 +126,7 @@ def _cleanup_utilities(site):
                               'include ability to clean up')
 
 def unsetup_portal(portal):
-  count = utils.remove_marker_ifaces(portal, [interfaces.IAudioEnhanced, interfaces.IAudioContainerEnhanced])
-  logger.warn('Removed IAudioEnhanced and IAudioContainerEnhanced interfaces from %i objects for '
-              'cleanup' % count)
+    count = utils.remove_marker_ifaces(portal, \
+        [interfaces.IAudioEnhanced, interfaces.IAudioContainerEnhanced])
+    logger.warn('Removed IAudioEnhanced and IAudioContainerEnhanced '
+                'interfaces from %i objects for cleanup' % count)
