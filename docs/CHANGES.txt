@@ -2,6 +2,14 @@
 p4a.ploneaudio Changes
 ======================
 
+p4a.ploneaudio 1.0rc1 (2007-07-31)
+==================================
+
+* Many bug fixes (resulting from Boston 2007 P4A sprint)
+
+* Much greater test coverage -- but still not complete (Rocky Burt)
+
+
 p4a.ploneaudio 1.0beta1 (2007-04-28)
 ====================================
 
