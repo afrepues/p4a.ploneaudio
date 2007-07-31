@@ -5,7 +5,15 @@ p4a.ploneaudio Changes
 p4a.ploneaudio 1.0rc1 (2007-07-31)
 ==================================
 
-* Many bug fixes (resulting from Boston 2007 P4A sprint)
+* Many bug fixes (resulting from Boston 2007 P4A sprint and Sorrento Sprint 2007)
+http://plone4artists.org/products/plone4artistsaudio/issues/
+    #20 - older view errors on activate/deactivate after explicit display setting
+    #24 - Extend audio container with additional fields
+    #25 — BTreeFolder-support broken
+    #35 — Missing Alt Tags on Some Images
+    #36 — Pickling Errors when uninstalling p4a products
+    #38 — Uploading MP3 files with genre 80's causes error
+    #39 — Audio upload crashes to a KeyError when uploading ogg with blank metadata
 
 * Much greater test coverage -- but still not complete (Rocky Burt)
 
