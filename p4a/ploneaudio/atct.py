@@ -123,6 +123,12 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
 
     ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFileAudio'
 
+    def _set_description(self,v):
+        self.context.setDescription(v)
+    def _get_description(self):
+        return self.context.Description()
+    description = property(_get_description, _set_description)
+
     def _load_audio_metadata(self):
         """Retrieve audio metadata from the raw file data and update
         this object's appropriate metadata fields.
