@@ -251,10 +251,9 @@ def attempt_media_activation(obj, evt):
     """Try to activiate the media capabilities of the given object.
     """
 
-    view = component.getMultiAdapter((obj, obj.REQUEST),
-                                     interface=interface.Interface,
-                                     name=u'media-config.html')
-    if view.media_activated:
+    activator = interfaces.IMediaActivator(obj)
+
+    if activator.media_activated:
         return
 
     mime_type = obj.get_content_type()
@@ -268,7 +267,7 @@ def attempt_media_activation(obj, evt):
         accessor = None
 
     if accessor is not None:
-        view.media_activated = True
+        activator.media_activated = True
         update_dublincore(obj, evt)
         update_catalog(obj, evt)
 

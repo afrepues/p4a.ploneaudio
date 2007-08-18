@@ -31,8 +31,8 @@ def setup_site(site):
 
     sm = site.getSiteManager()
     if not sm.queryUtility(interfaces.IAudioSupport):
-        sm.registerUtility(interfaces.IAudioSupport,
-                           content.AudioSupport('audio_support'))
+        sm.registerUtility(provided=interfaces.IAudioSupport,
+                           component=content.AudioSupport('audio_support'))
 
 def setup_indexes(portal):
     """Install specific indexes for the audio metadata fields
