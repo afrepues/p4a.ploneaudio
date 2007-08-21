@@ -13,6 +13,12 @@ from p4a.audio.interfaces import IAudio
 import logging
 logger = logging.getLogger('p4a.ploneaudio.sitesetup')
 
+try:
+    import five.localsitemanager
+    HAS_FLSM = True
+except:
+    HAS_FLSM = False
+
 def setup_portal(portal):
     site.ensure_site(portal)
     setup_site(portal)
@@ -31,8 +37,12 @@ def setup_site(site):
 
     sm = site.getSiteManager()
     if not sm.queryUtility(interfaces.IAudioSupport):
-        sm.registerUtility(provided=interfaces.IAudioSupport,
-                           component=content.AudioSupport('audio_support'))
+        if HAS_FLSM:
+            sm.registerUtility(provided=interfaces.IAudioSupport,
+                               component=content.AudioSupport('audio_support'))
+        else:
+            sm.registerUtility(interfaces.IAudioSupport,
+                               content.AudioSupport('audio_support'))
 
 def setup_indexes(portal):
     """Install specific indexes for the audio metadata fields
