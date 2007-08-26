@@ -10,6 +10,8 @@ from p4a.audio import audioanno
 from p4a.audio import interfaces
 from p4a.audio import utils
 
+from p4a.common.descriptors import atfield
+
 from p4a.fileimage import file as p4afile
 from p4a.fileimage import utils as fileutils
 
@@ -123,11 +125,8 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
 
     ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFileAudio'
 
-    def _set_description(self,v):
-        self.context.setDescription(v)
-    def _get_description(self):
-        return self.context.Description()
-    description = property(_get_description, _set_description)
+    title = atfield('title', 'context')
+    description = atfield('description', 'context')
 
     def _load_audio_metadata(self):
         """Retrieve audio metadata from the raw file data and update
