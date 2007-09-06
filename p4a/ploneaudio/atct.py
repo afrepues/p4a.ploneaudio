@@ -238,7 +238,7 @@ def sync_audio_metadata(obj, evt):
             attrs = description.attributes
             orig = {}
             for key in attrs:
-                if key != 'file':
+                if key != 'file' and hasattr(audio, key):
                     orig[key] = getattr(audio, key)
             if 'file' in attrs:
                 audio._load_audio_metadata()
