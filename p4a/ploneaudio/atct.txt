@@ -49,8 +49,8 @@ a few of the adapters as well.
     >>> from Products.ATContentTypes import interface as atctifaces  
     >>> component.provideAdapter(atct.ATCTFileAudio)
 
-    >>> from zope.app.annotation.interfaces import IAttributeAnnotatable
-    >>> from zope.app.annotation.attribute import AttributeAnnotations
+    >>> from zope.annotation.interfaces import IAttributeAnnotatable
+    >>> from zope.annotation.attribute import AttributeAnnotations
     >>> component.provideAdapter(AttributeAnnotations)
 
 Next we setup some mock folder content that we can test with.
