@@ -16,7 +16,8 @@ logger = logging.getLogger('p4a.ploneaudio.sitesetup')
 try:
     import five.localsitemanager
     HAS_FLSM = True
-except:
+    logger.info('Using five.localsitemanager')
+except ImportError, err:
     HAS_FLSM = False
 
 def setup_portal(portal):
@@ -37,12 +38,13 @@ def setup_site(site):
 
     sm = site.getSiteManager()
     if not sm.queryUtility(interfaces.IAudioSupport):
+        # registerUtility api changed between Zope 2.9 and 2.10
         if HAS_FLSM:
             sm.registerUtility(content.AudioSupport('audio_support'),
-                interfaces.IAudioSupport)
+                               interfaces.IAudioSupport)
         else:
-            sm.registerUtility(content.AudioSupport('audio_support'),
-                interfaces.IAudioSupport)
+            sm.registerUtility(interfaces.IAudioSupport,
+                               content.AudioSupport('audio_support'))
 
 def setup_indexes(portal):
     """Install specific indexes for the audio metadata fields
