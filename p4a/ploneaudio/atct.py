@@ -1,6 +1,11 @@
 import os
 import Acquisition
 from OFS import Image as ofsimage
+try:
+    from zope.app.annotation import interfaces as annointerfaces
+except ImportError, err:
+    # Zope 2.10 support
+    from zope.annotation import interfaces as annointerfaces
 
 from zope import component
 from zope import interface
@@ -275,7 +280,9 @@ def update_dublincore(obj, evt):
     """
 
     audio = interfaces.IAudio(obj)
-    obj.setTitle(audio.title)
+    annotations = annointerfaces.IAnnotations(obj)
+    data = annotations.get(audio.ANNO_KEY, None)
+    obj.setTitle(data.get('title', u''))
 
 def update_catalog(obj, evt):
     """Reindex the object in the catalog.
