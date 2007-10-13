@@ -9,7 +9,6 @@ def test_suite():
         return suite
 
     suite.addTest(doctestunit.DocTestSuite('p4a.ploneaudio'))
-    suite.addTest(doctestunit.DocTestSuite('p4a.ploneaudio.atct'))
     suite.addTest(doctestunit.DocTestSuite('p4a.ploneaudio.content'))
     suite.addTest(doctestunit.DocFileSuite('atct.txt',
                                            package='p4a.ploneaudio',
@@ -20,6 +19,9 @@ def test_suite():
                                            package='p4a.ploneaudio',
                                            optionflags=doctest.ELLIPSIS))
     suite.addTest(doctestunit.DocFileSuite('sitesetup.txt',
+                                           package='p4a.ploneaudio',
+                                           optionflags=doctest.ELLIPSIS))
+    suite.addTest(doctestunit.DocFileSuite('syndication.txt',
                                            package='p4a.ploneaudio',
                                            optionflags=doctest.ELLIPSIS))
 

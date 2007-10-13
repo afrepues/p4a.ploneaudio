@@ -45,6 +45,8 @@ sure that it has all appropriate interfaces.
     ...     manage_addColumn = addColumn
     ...     def refreshCatalog(self): pass
     ...     def columns(self): return self._metadata.keys()
+    ...     def __call__(self, **kwargs):
+    ...         return []
 
     >>> catalog = site.portal_catalog = MockCatalog()
 
@@ -122,3 +124,8 @@ but raise an exception at this point.
     Traceback (most recent call last):
       ...
     NotImplementedError...
+
+And we also have the ``unsetup_portal`` function.  So lets see how that
+runs as well.
+
+    >>> sitesetup.unsetup_portal(site)

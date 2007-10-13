@@ -1,40 +1,101 @@
 Syndication
 ===========
 
-Current syndication functionality is provided using the Zope 2 
-``fatsyndication`` product.
+First we need to make sure the container feed class can be instantiated.
 
-Lets begin by creating an audio container with some audio files.
+    >>> from p4a.ploneaudio.syndication import AudioContainerFeed
+    >>> AudioContainerFeed(None)
+    <p4a.ploneaudio.syndication.AudioContainerFeed ...>
 
-  >>> id = folder.invokeFactory('Folder', 'audio-container')
-  >>> container = folder[id]
-  >>> config = container.restrictedTraverse('@@media-config.html')
-  >>> config.media_activated = True
+Next we can get the feed source and ask it for entries.  But before we
+can do that we need to hookup a mock ``IAudioProvider`` adapter.
 
-  >>> id = container.invokeFactory('File', 'audio-item-1')
-  >>> item1 = container[id]
-  >>> config = item1.restrictedTraverse('@@media-config.html')
-  >>> config.media_activated = True
+    >>> from zope.interface import implements
+    >>> from Products.basesyndication.interfaces import IFeedEntry, IEnclosure
+    >>> from p4a.ploneaudio.syndication import AudioContainerFeedSource
+    >>> from p4a.audio.interfaces import IAudioProvider
+    >>> class MockFolder(object):
+    ...     implements(IAudioProvider, IFeedEntry)
+    ...     audio_items = []
 
-  >>> from p4a.audio import interfaces
-  >>> audio = interfaces.IAudio(item1)
-  >>> audio.title = u'My Test Audio'
+    >>> AudioContainerFeedSource(MockFolder()).getFeedEntries()
+    []
 
-Since some sample content has been configured we can now start testing
-the syndication feeds.
+Now that the feed container information has been setup we can test the
+audio items specifically.  But first we check the audio source.
 
-  >>> feedview = container.restrictedTraverse('@@rss.xml')
-  >>> feed = feedview.getFeed()
-  >>> feed
-  <p4a.ploneaudio.syndication.AudioContainerFeed ...>
+    >>> from p4a.ploneaudio.syndication import AudioFeedSource
+    >>> AudioFeedSource(MockFolder()).getFeedEntries()
+    [<MockFolder object ...>]
 
-  >>> entries = feed.getFeedEntries()
-  >>> len(entries)
-  1
-  >>> entries
-  [<p4a.ploneaudio.syndication.AudioFeedEntry ...>]
+And now we check the feed entries.
 
-  >>> entries[0].getTitle()
-  u'My Test Audio'
-  >>> 'audio-item-1' in entries[0].getWebURL()
-  True
+    >>> from p4a.ploneaudio.syndication import AudioFeedEntry
+    >>> from p4a.audio.interfaces import IAudio 
+    >>> class MockAudio(object):
+    ...     implements(IAudio, IEnclosure)
+    ...     title = u'Mock audio'
+    ...     artist = u'Mock artist'
+    ...     description = u'Mock description'
+    ...     genre = 4
+    >>> entry = AudioFeedEntry(MockAudio())
+    >>> entry
+    <p4a.ploneaudio.syndication.AudioFeedEntry instance ...>
+
+    >>> entry.getBody()
+    ''
+
+    >>> entry.getEnclosure()
+    <MockAudio object ...>
+
+    >>> entry.getTitle()
+    u'Mock audio'
+
+    >>> entry.getArtist()
+    u'Mock artist'
+
+    >>> entry.getDescription()
+    u'Mock description'
+
+    >>> entry.getCategory()
+    'Disco'
+
+Of course if we set a radical genre id that doesn't exist, we get empty
+behaviour.
+
+    >>> entry.context.genre = 900000
+    >>> entry.getCategory()
+    u''
+
+As far as actual enclosure support is concerned, we can see here what happens.
+
+    >>> from p4a.ploneaudio.syndication import ATFileEnclosure
+    >>> class MockContent(object):
+    ...     def __init__(self, **kwargs):
+    ...         for k, v in kwargs.items(): setattr(self, k, v)
+    ...     def absolute_url(self): return 'http://nohost.com/someurl'
+    ...     def getFile(self):
+    ...         return MockContent(get_size=lambda: 10,
+    ...                            getContentType=lambda: 'text/plain')
+    >>> enclosure = ATFileEnclosure(MockContent())
+    >>> enclosure
+    <p4a.ploneaudio.syndication.ATFileEnclosure object ...>
+
+    >>> enclosure.getURL()
+    'http://nohost.com/someurl'
+
+    >>> enclosure.getLength()
+    10
+
+    >>> len(enclosure)
+    10
+
+    >>> enclosure.getMajorType()
+    'text'
+
+    >>> enclosure.getMinorType()
+    'plain'
+
+    >>> enclosure.getType()
+    'text/plain'
+

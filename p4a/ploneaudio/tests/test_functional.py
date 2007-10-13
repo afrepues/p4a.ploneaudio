@@ -20,7 +20,7 @@ def test_suite():
 
     if ploneaudio.has_fatsyndication_support():
         suite.addTest(ZopeDocFileSuite(
-            'syndication.txt',
+            'syndication-integration.txt',
             package='p4a.ploneaudio',
             test_class=testing.IntegrationTestCase,
             optionflags=doctest.ELLIPSIS,
