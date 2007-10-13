@@ -49,8 +49,12 @@ a few of the adapters as well.
     >>> from Products.ATContentTypes import interface as atctifaces  
     >>> component.provideAdapter(atct.ATCTFileAudio)
 
-    >>> from zope.annotation.interfaces import IAttributeAnnotatable
-    >>> from zope.annotation.attribute import AttributeAnnotations
+    >>> try:
+    ...     from zope.app.annotation.interfaces import IAttributeAnnotatable
+    ...     from zope.app.annotation.attribute import AttributeAnnotations
+    ... except ImportError, err:
+    ...     from zope.annotation.interfaces import IAttributeAnnotatable
+    ...     from zope.annotation.attribute import AttributeAnnotations
     >>> component.provideAdapter(AttributeAnnotations)
 
 Next we setup some mock folder content that we can test with.
@@ -73,7 +77,7 @@ Now we audio enhance it and do a query of the audio items.
     >>> newid = testfolder._setObject(file1.getId(), file1)
     >>> provider = atct.ATCTFolderAudioProvider(testfolder)
     >>> provider.audio_items
-    [<p4a.audio ATCTFileAudio title=None>]
+    [<p4a.audio ATCTFileAudio title=>]
 
 We can also lookup audio information on this folder.  But since the folder
 hasn't been marked as ``IAudioContainerEnhanced`` lookup will return None.
@@ -99,7 +103,7 @@ with.
 
     >>> provider = atct.ATCTTopicAudioProvider(testtopic)
     >>> provider.audio_items
-    [<p4a.audio ATCTFileAudio title=None>]
+    [<p4a.audio ATCTFileAudio title=>]
 
 We can also lookup audio information on this smart folder.  But since the
 smart folder hasn't been marked as ``IAudioContainerEnhanced`` lookup will
@@ -195,6 +199,8 @@ But first we need to setup a test request and register our view component.
     ...                                  TestRequest),
     ...                          provides=interface.Interface,
     ...                          name=u'media-config.html')
+    >>> from p4a.audio.media import MediaActivator
+    >>> component.provideAdapter(MediaActivator)
 
     >>> view = media.ToggleEnhancementsView(file1, file1.REQUEST)
     >>> view.media_activated
