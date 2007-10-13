@@ -1,13 +1,15 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '1.0rc1'
+version = '1.0'
+readme = open('README.txt')
+long_description = readme.read()
+readme.close()
 
 setup(name='p4a.ploneaudio',
       version=version,
       description="Plone4Artists audio add-on for Plone ",
-      long_description="""p4a.ploneaudio is an audio add-on for the Plone
-CMS.""",
+      long_description=long_description,
       classifiers=[
           'Framework :: Zope3',
           'Framework :: Plone',
@@ -26,7 +28,7 @@ CMS.""",
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          # -*- Extra requirements: -*-
+          'p4a.audio>=1.0',
       ],
       entry_points="""
       # -*- Entry points: -*-
