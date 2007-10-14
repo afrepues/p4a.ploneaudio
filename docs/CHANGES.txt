@@ -2,6 +2,12 @@
 p4a.ploneaudio Changes
 ======================
 
+p4a.ploneaudio 1.0 (2007-10-14)
+===============================
+
+* Miscellaneous bug fixes and view updates
+
+
 p4a.ploneaudio 1.0rc1 (2007-07-31)
 ==================================
 
