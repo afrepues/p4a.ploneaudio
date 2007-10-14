@@ -36,9 +36,13 @@ Start by creating a new smart folder.
     >>> browser.getControl('Save').click()
 
 At this point we're inside an empty smart folder.  The first test here is to
-*audio activate* this smart folder.
-
-    >>> browser.getLink('Activate Audio').click()
+*audio activate* this smart folder.  And change display to 'Album View'
+   
+    >>> browser.open(portal_url + '/test-smart-audio-album/media-config.html')
+    >>> browser.getLink('Display').click()
+    >>> browser.getControl('Album view').click()
+    >>> browser.getControl('Save').click()
+    
 
 Since the album/smart-folder is currently empty, the total length amount should
 be zero.
@@ -59,7 +63,10 @@ We begin by setting up a test folder.
 At this point we're inside an empty folder.  The first test here is to
 *audio activate* this folder.
 
-    >>> browser.getLink('Activate Audio').click()
+    >>> browser.open(portal_url + '/test-audio-album/media-config.html')
+    >>> browser.getLink('Display').click()
+    >>> browser.getControl('Album view').click()
+    >>> browser.getControl('Save').click()
 
 Since the album/folder is currently empty, the total length amount should
 be zero.
@@ -102,6 +109,7 @@ Finally save the form and close the file.
 
    >>> browser.getControl(name='form_submit').click()
    >>> mp3.close()
+   
 
    >>> 'Changes saved.' in browser.contents
    True
@@ -129,7 +137,7 @@ Since we have uploaded mp3 file we should get all meta info.
     >>> '62.1 kB' in browser.contents
     True
 
-    >>> 'MP3 (audio/mpeg)' in browser.contents
+    >>> 'MPEG-1 Audio Layer 3 (audio/mpeg)' in browser.contents
     True
 
     >>> '128 Kbps' in browser.contents
@@ -146,7 +154,6 @@ Edit MP3 file
 ====================
 We assume that we have test-audio-album folder with mp3 file inside.
 First we need to open the folder
-
     >>> browser.open(portal_url + '/test-audio-album')
 
 Than we need the mp3 file and edit form
@@ -162,8 +169,6 @@ Now we will change all fields
     >>> browser.getControl(name='form.album').value = 'New Album Title'
     >>> browser.getControl(name='form.year').value = '2007'
     >>> browser.getControl(name='form.genre').value = ['37'] #Sound Clip
-    >>> browser.getControl(name='_modify_form.file').value = ['0']
-    >>> browser.getControl(name='_modify_form.audio_image').value = ['0']
     >>> browser.getControl(name='form.file').mech_control.add_file(StringIO())
     >>> browser.getControl(name='form.audio_image').mech_control.add_file(StringIO())
     >>> browser.getControl(name='form.comment').value = 'A test made durring Sorrento Sprint.'
@@ -192,7 +197,7 @@ Now the new metadata should be found
     >>> '62.1 kB' in browser.contents
     True
 
-    >>> 'MP3 (audio/mpeg)' in browser.contents
+    >>> 'MPEG-1 Audio Layer 3 (audio/mpeg)' in browser.contents
     True
 
     >>> '128 Kbps' in browser.contents
@@ -287,14 +292,12 @@ Now we are going up to test-audio-album folder
 
 And check if we get actual data
 
-    >>> '<dd>00:06 (mm:ss)</dd>' in browser.contents
+    >>> '<td>00:03</td>' in browser.contents
     True
-
+    
     >>> 'Test of the Emercy Broadcast System' in browser.contents
     True
 
-    >>> 'First MP3 file with image' in browser.contents
-    True
 
 
 Finally we should be able to open the file again
@@ -427,12 +430,12 @@ on the folder:
     >>> browser.open(portal_url + '/test-audio-album')
     >>> music_folder = portal.contentValues(filter= {'portal_type': ('Folder',) } )[0]
     >>> music_folder.getLayout()
-    'audio-container.html'
+    'audio-album.html'
 
 Then we deactivate the audio-folder. The layout should switch back
 to the default folder-layout 'folder_listing'.
 
-    >>> browser.getLink('Deactivate Audio').click()
+    >>> browser.open(portal_url + '/test-audio-album/media-config.html')
     >>> music_folder.getLayout()
     'folder_listing'
 

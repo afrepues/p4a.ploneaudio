@@ -33,10 +33,11 @@ This is what the testfile looks like before adaptation to IAudio
   >>> testfile1
   <ATFile at /plone/Members/test_user_1_/testfile1>
 
+
 Now adapting it should work fine.
 
   >>> IAudio(testfile1)
-  <p4a.audio ATCTFileAudio title=None>
+  <p4a.audio ATCTFileAudio title=...>
 
 Lets do the same thing with a folder.  Since p4a.audio allows folders
 to additionally be media enhanced (as audio containers).
@@ -96,7 +97,7 @@ This is what the testfile looks like before adaptation to IAudio
 Now adapting it should work fine.
 
   >>> IAudio(testfile2)
-  <p4a.audio ATCTFileAudio title=None>
+  <p4a.audio ATCTFileAudio title=...>
   
 And we can get to the audio data - which has no keys, because it was a 
 fake file.
