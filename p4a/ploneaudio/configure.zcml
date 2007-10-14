@@ -1,6 +1,17 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:zcml="http://namespaces.zope.org/zcml">
+
+
+  <genericsetup:registerProfile
+     name="default"
+     title="ploneaudio"
+     directory="profiles/default"
+     description="Extension profile for ploneaudio"
+     provides="Products.GenericSetup.interfaces.EXTENSION"
+     />
+
 
   <class class="Products.ATContentTypes.content.topic.ATTopic">
       <implements interface="p4a.audio.interfaces.IPossibleAudioContainer" />
