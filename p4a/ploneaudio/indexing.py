@@ -35,6 +35,7 @@ registerIndexableAttribute('audio_genre_id', audio_genre_id)
 def SearchableText(obj, portal, **kwargs):
     """ Used by the catalog for basic full text indexing """
 
+    charset = obj.getCharset()
     audiofile = interfaces.IAudio(obj, None)
 
     if audiofile is not None:
@@ -43,9 +44,9 @@ def SearchableText(obj, portal, **kwargs):
         else:
             genre = ''
         return_list = [obj.SearchableText(),
-                       audiofile.artist,
-                       genre]
-        return u' '.join([x.strip() for x in return_list if x])
+                       audiofile.artist.encode(charset),
+                       genre.encode(charset)]
+        return ' '.join([x.strip() for x in return_list if x])
     else:
         return obj.SearchableText()
 
