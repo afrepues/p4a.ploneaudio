@@ -36,18 +36,17 @@ Start by creating a new smart folder.
     >>> browser.getControl('Save').click()
 
 At this point we're inside an empty smart folder.  The first test here is to
-*audio activate* this smart folder.  And change display to 'Album View'. It is necessary to go through the 'Display' form as test browser cannot follow the Javascript links in Plone.
-   
-    >>> browser.open(portal_url + '/test-smart-audio-album/media-config.html')
-    >>> browser.getLink('Display').click()
-    >>> browser.getControl('Album view').click()
-    >>> browser.getControl('Save').click()
-    
+*audio activate* this smart folder.  And change display to 'Album View'. It is
+necessary to go through the 'Display' form as test browser cannot follow the
+Javascript links in Plone.
 
-Since the album/smart-folder is currently empty, the total length amount should
-be zero.
+    >>> browser.getLink('Activate Audio').click()
 
-    >>> 'Audio information unavailable' in browser.contents
+Since the album/smart-folder is currently empty, there should be a status
+message saying such.
+
+
+    >>> 'No audio uploaded yet.' in browser.contents
     True
 
 Audio Folders
@@ -63,15 +62,12 @@ We begin by setting up a test folder.
 At this point we're inside an empty folder.  The first test here is to
 *audio activate* this folder.
 
-    >>> browser.open(portal_url + '/test-audio-album/media-config.html')
-    >>> browser.getLink('Display').click()
-    >>> browser.getControl('Album view').click()
-    >>> browser.getControl('Save').click()
+    >>> browser.getLink('Activate Audio').click()
 
 Since the album/folder is currently empty, the total length amount should
 be zero.
 
-    >>> 'Audio information unavailable' in browser.contents
+    >>> 'No audio uploaded yet.' in browser.contents
     True
 
 Since we have a folder we will add new mp3 file. First create file object:
@@ -292,9 +288,6 @@ Now we are going up to test-audio-album folder
 
 And check if we get actual data
 
-    >>> '<td>00:03</td>' in browser.contents
-    True
-    
     >>> 'Test of the Emercy Broadcast System' in browser.contents
     True
 
@@ -430,7 +423,7 @@ on the folder:
     >>> browser.open(portal_url + '/test-audio-album')
     >>> music_folder = portal.contentValues(filter= {'portal_type': ('Folder',) } )[0]
     >>> music_folder.getLayout()
-    'audio-album.html'
+    'audio-container.html'
 
 Then we deactivate the audio-folder. The layout should switch back
 to the default folder-layout 'folder_listing'.

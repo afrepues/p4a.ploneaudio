@@ -1,6 +1,7 @@
 import os
 import unittest
 import doctest
+from zope.testing import doctestunit
 from p4a import ploneaudio
 import p4a.audio.tests
 from p4a.ploneaudio.tests import testing
@@ -26,6 +27,12 @@ def test_suite():
             optionflags=doctest.ELLIPSIS,
             )
         )
+
+    suite.addTest(doctestunit.DocFileSuite('media-player.txt',
+                                           package="p4a.audio"))
+
+    suite.addTest(doctestunit.DocFileSuite('migration.txt',
+                                           package="p4a.audio"))
 
     suite.addTest(ZopeDocFileSuite(
         'plone-audio.txt',

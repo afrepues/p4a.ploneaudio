@@ -37,14 +37,14 @@ be a unicode string that only contains the regular ``SearchableText`` content.
     >>> audiofile.artist = u''
     >>> audiofile.SearchableText = lambda: 'hello world'
     >>> indexing.SearchableText(audiofile, None)
-    u'hello world'
+    'hello world'
 
 When a genre is set to it's numeric code, the indexed content will contain
 the english-looking title of that genre.
 
     >>> audiofile.genre = 4
     >>> indexing.SearchableText(audiofile, None)
-    u'hello world Disco'
+    'hello world Disco'
 
 Audio-specific Indexes
 ----------------------
