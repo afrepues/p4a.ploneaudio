@@ -2,6 +2,17 @@
 p4a.ploneaudio Changes
 ======================
 
+p4a.ploneaudio 1.0.1 (unreleased)
+=================================
+
+Bug Fixes
+---------
+
+* Fixed some tests (Aaron Vanderlip)
+
+* Made SearchableText output be encoded (Lennart Regebro)
+
+
 p4a.ploneaudio 1.0 (2007-10-14)
 ===============================
 

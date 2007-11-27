@@ -36,7 +36,7 @@ Start by creating a new smart folder.
     >>> browser.getControl('Save').click()
 
 At this point we're inside an empty smart folder.  The first test here is to
-*audio activate* this smart folder.  And change display to 'Album View'
+*audio activate* this smart folder.  And change display to 'Album View'. It is necessary to go through the 'Display' form as test browser cannot follow the Javascript links in Plone.
    
     >>> browser.open(portal_url + '/test-smart-audio-album/media-config.html')
     >>> browser.getLink('Display').click()
@@ -452,14 +452,6 @@ Now we audio-activate the folder again. The new default audio-view should be
     >>> browser.getLink('Activate Audio').click()
     >>> music_folder.getLayout()
     'audio-container.html'
-
-This will change the layout-attribute on the folder to 'audio-container.html'.
-
-    >>> music_folder.getLayout()
-    'audio-container.html'
-
-    >>> 'id="tracklisting"' in browser.contents
-    True
 
     >>> 'title="Deactivate Audio">Deactivate Audio</a>' in browser.contents
     True
