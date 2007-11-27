@@ -2,7 +2,7 @@
 p4a.ploneaudio Changes
 ======================
 
-p4a.ploneaudio 1.0.1 (unreleased)
+p4a.ploneaudio 1.0.1 (2007-11-27)
 =================================
 
 Bug Fixes
