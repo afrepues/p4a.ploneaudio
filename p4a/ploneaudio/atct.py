@@ -262,12 +262,10 @@ def attempt_media_activation(obj, evt):
 
     mime_type = obj.get_content_type()
     try:
-        accessor = component.getAdapter(obj, 
+        accessor = component.getAdapter(obj,
                                         interfaces.IAudioDataAccessor,
                                         unicode(mime_type))
     except Exception, e:
-        logger.warn("Media activation bypassed for object with mime "
-                    "type of '%s'" % mime_type)
         accessor = None
 
     if accessor is not None:
