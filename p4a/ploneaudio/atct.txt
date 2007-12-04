@@ -12,6 +12,8 @@ First we create some mock classes for testing content.
     >>> from Products.ATContentTypes.content import folder, file, topic
     >>> from p4a.audio import interfaces
     >>> from zope import interface
+    >>> from zope import component
+    >>> from Products.Archetypes import interfaces as atifaces
 
     >>> class MockPortalTypes:
     ...     def listContentTypes(self): return []
@@ -36,6 +38,11 @@ First we create some mock classes for testing content.
     ...     portal_url = MockPortalTool()
     ...     def getFolderContents(self, *args, **kwargs):
     ...         return self.objectValues()
+    >>> def schema(context):
+    ...     return file.ATFile.schema
+    >>> component.provideAdapter(schema,
+    ...                          provides=atifaces.ISchema,
+    ...                          adapts=(MockFolder,))
 
     >>> class MockTopic(topic.ATTopic, MockFolder):
     ...     def queryCatalog(self, **kwargs):
@@ -44,9 +51,8 @@ First we create some mock classes for testing content.
 Many of our classes use adapters to handle their logic so we need to setup
 a few of the adapters as well.
 
-    >>> from zope import component
     >>> from p4a.ploneaudio import atct
-    >>> from Products.ATContentTypes import interface as atctifaces  
+    >>> from Products.ATContentTypes import interface as atctifaces
     >>> component.provideAdapter(atct.ATCTFileAudio)
 
     >>> try:
@@ -61,8 +67,18 @@ Next we setup some mock folder content that we can test with.
 
     >>> testfolder = MockFolder('testfolder')
     >>> file1 = file.ATFile('file1')
-    >>> interface.alsoProvides(file1, atctifaces.IATFile,
-    ...                        IAttributeAnnotatable)
+    >>> class MockFile(file.ATFile):
+    ...     interface.implements(atctifaces.IATFile,
+    ...                          IAttributeAnnotatable,
+    ...                          interfaces.IMediaActivator)
+    ...     media_activated = False
+    >>> def schema(context):
+    ...     return file.ATFile.schema
+    >>> component.provideAdapter(schema,
+    ...                         provides=atifaces.ISchema,
+    ...                         adapts=(MockFile,))
+
+    >>> file1 = MockFile('foo')
 
 Since our file instance still doesn't provide IAudioEnhanced the
 adapter lookup will return None.
@@ -73,6 +89,7 @@ adapter lookup will return None.
 Now we audio enhance it and do a query of the audio items.
 
     >>> interface.alsoProvides(file1, interfaces.IAudioEnhanced)
+    >>> testfolder.aq_explicit = testfolder
 
     >>> newid = testfolder._setObject(file1.getId(), file1)
     >>> provider = atct.ATCTFolderAudioProvider(testfolder)
@@ -276,14 +293,14 @@ Make sure setting and getting the file attribute works properly (uses
 properties at the moment).
 
     >>> audio.file
-    <File at file1/file>
+    <File at foo/file>
 
 When we set the file directly it actually issues an upload command so
 the string value becomes the file object value.
 
     >>> audio.file = 'foo'
     >>> audio.file
-    <File at file1/file>
+    <File at foo/file>
 
 In it's starting condition, the ``audio_image`` field will have no value.
 

@@ -31,13 +31,20 @@ Smart Folders
 Start by creating a new smart folder.
 
     >>> browser.open(portal_url)
-    >>> browser.getLink('Smart Folder').click()
+    >>> try:
+    ...     addtopic = browser.getLink('Smart Folder')
+    ... except:
+    ...     # support for Plone 3.0
+    ...     addtopic = browser.getLink('Collection')
+    >>> addtopic.click()
     >>> browser.getControl(name='title').value = 'Test Smart Audio Album'
     >>> browser.getControl('Save').click()
 
 At this point we're inside an empty smart folder.  The first test here is to
-*audio activate* this smart folder.  And change display to 'Album View'. It is necessary to go through the 'Display' form as test browser cannot follow the Javascript links in Plone.
-   
+*audio activate* this smart folder.  And change display to 'Album View'. It
+is necessary to go through the 'Display' form as test browser cannot follow
+the Javascript links in Plone.
+
     >>> browser.open(portal_url + '/test-smart-audio-album/media-config.html')
     >>> browser.getLink('Display').click()
     >>> browser.getControl('Album view').click()
@@ -220,11 +227,12 @@ First we need to open folder view
 
 Then we need to upload in to the form
 
-    >>> browser.getLink('File').click()
-    >>> browser.getControl(name='title').value = 'Test OGG File'
-    >>> browser.getControl(name='description').value = 'Test description'
+    >>> browser.getLink(url='createObject?type_name=File').click()
+    >>> editform = browser.getForm(name='edit_form')
+    >>> editform.getControl(name='title').value = 'Test OGG File'
+    >>> editform.getControl(name='description').value = 'Test description'
 
-    >>> upload_control = browser.getControl(name='file_file')
+    >>> upload_control = editform.getControl(name='file_file')
     >>> upload_file = upload_control.mech_control
     >>> upload_file.add_file(ogg,filename='test-full.ogg')
 
@@ -321,7 +329,7 @@ Then we need to create and upload mp3 file.
 
 Then we need to upload in to the form
 
-    >>> browser.getLink('File').click()
+    >>> browser.getLink(url='createObject?type_name=File').click()
     >>> browser.getControl(name='title').value = 'Test u_Mp3 File'
     >>> browser.getControl(name='description').value = 'Test description'
 
@@ -358,7 +366,7 @@ Then we need to create and upload mp3 file.
 
 Then we need to upload in to the form
 
-    >>> browser.getLink('File').click()
+    >>> browser.getLink(url='createObject?type_name=File').click()
     >>> browser.getControl(name='title').value = 'Test Dummy Genre File'
     >>> browser.getControl(name='description').value = 'Test description'
 
@@ -385,25 +393,13 @@ First enable the adding of large plone folders via the portal_types
     >>> portal_types = app.plone.portal_types
     >>> portal_types['Large Plone Folder'].global_allow = True
 
-There's currently an annoying testbrowser bug that doesn't let us click
-on links with spaces in them.  So we'll do a little renaming of the portal
-type here.
-
-    >>> self.loginAsPortalOwner()
-    >>> portal_types.manage_renameObjects(['Large Plone Folder'], ['LargePloneFolder'])
-
 Visit the homepage, add a large folder, and finally audio-activiate it.
 
     >>> browser.open(portal_url)
     >>> browser.getLink('Large Folder').click()
-
-When you get the error: " When URLs have spaces in them, they're handled
-correctly (before the bug was fixed, you'd get 'ValueError: too many values
-to unpack')", this is because of a bug in zope.testbrowser.
-
     >>> browser.getControl(name='title').value = 'Large Music Folder'
     >>> browser.getControl(name='form_submit').click()
-    >>> browser.getLink('Activate Audio').click()
+    >>> browser.getLink(url='change_type?subtype=p4a.audio.').click()
 
 
 Activating a folder as audio also activates video:  issue #28
@@ -417,45 +413,3 @@ video-strings present.
     False
     >>> 'video-config.html' in browser.contents
     False
-
-
-
- Activate - Deactivate: issue #20
-=============================================
-
-Visit the audio-activated folder. The view is currently the
-default audio-view. We can check this by calling the getLayout()-method
-on the folder:
-
-    >>> browser.open(portal_url + '/test-audio-album')
-    >>> music_folder = portal.contentValues(filter= {'portal_type': ('Folder',) } )[0]
-    >>> music_folder.getLayout()
-    'audio-album.html'
-
-Then we deactivate the audio-folder. The layout should switch back
-to the default folder-layout 'folder_listing'.
-
-    >>> browser.open(portal_url + '/test-audio-album/media-config.html')
-    >>> music_folder.getLayout()
-    'folder_listing'
-
-Now we change default view to 'summary view',
-this will set an 'layout'-attribute to the folder.
-
-    >>> browser.getLink('Summary view').click()
-    >>> music_folder.getLayout()
-    'folder_summary_view'
-
-Now we audio-activate the folder again. The new default audio-view should be
- immediately active.
-
-    >>> browser.getLink('Activate Audio').click()
-    >>> music_folder.getLayout()
-    'audio-container.html'
-
-    >>> 'title="Deactivate Audio">Deactivate Audio</a>' in browser.contents
-    True
-
-Now we audio-deactivate it again.
-
-    >>> browser.getLink('Deactivate Audio').click()

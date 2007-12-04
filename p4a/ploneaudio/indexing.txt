@@ -16,11 +16,20 @@ returned.
 
     >>> from p4a.ploneaudio import atct, indexing
     >>> from Products.ATContentTypes.content import file
+    >>> from Products.Archetypes import interfaces as atifaces
+    >>> from zope import component
     >>> from Products.MimetypesRegistry.MimeTypesRegistry \
     ...     import MimeTypesRegistry
 
     >>> basicfile = file.ATFile('basicfile')
     >>> basicfile.mimetypes_registry = MimeTypesRegistry()
+
+    >>> def schema(context):
+    ...     return file.ATFile.schema
+    >>> component.provideAdapter(schema,
+    ...                          provides=atifaces.ISchema,
+    ...                          adapts=(file.ATFile,))
+
     >>> indexing.SearchableText(basicfile, None)
     'basicfile '
 
@@ -37,14 +46,14 @@ be a unicode string that only contains the regular ``SearchableText`` content.
     >>> audiofile.artist = u''
     >>> audiofile.SearchableText = lambda: 'hello world'
     >>> indexing.SearchableText(audiofile, None)
-    u'hello world'
+    'hello world'
 
 When a genre is set to it's numeric code, the indexed content will contain
 the english-looking title of that genre.
 
     >>> audiofile.genre = 4
     >>> indexing.SearchableText(audiofile, None)
-    u'hello world Disco'
+    'hello world Disco'
 
 Audio-specific Indexes
 ----------------------

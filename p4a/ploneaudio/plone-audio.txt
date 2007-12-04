@@ -7,7 +7,7 @@ and wrapping it with a Plone integration layer.
 We begin this process by creating a new instance of a file content
 type.
 
-  >>> id = self.folder.invokeFactory(self.file_type, 'testfile1')
+  >>> id = self.folder.invokeFactory('File', 'testfile1')
   >>> testfile1 = self.folder[id]
 
 By default, doing an IAudio adapter lookup on that file should fail since
@@ -67,7 +67,7 @@ Now we'll add something to that folder because we want to explore accessing view
 attributes on the item from the context of the container (and we don't know 
 how to do it!)
   
-  >>> id = testfolder1.invokeFactory(self.file_type, 'testfile2')
+  >>> id = testfolder1.invokeFactory('File', 'testfile2')
   >>> testfile2 = testfolder1[id]
 
 By default, doing an IAudio adapter lookup on that file should fail since

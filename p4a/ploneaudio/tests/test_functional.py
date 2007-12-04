@@ -1,49 +1,62 @@
 import os
-import unittest
 import doctest
-from p4a import ploneaudio
-import p4a.audio.tests
-from p4a.ploneaudio.tests import testing
-from Testing.ZopeTestCase.zopedoctest import ZopeDocFileSuite
-from Testing.ZopeTestCase import FunctionalDocFileSuite
+import unittest
 from App import Common
-from Products.PloneTestCase import layer
+
+from zope.testing import doctestunit
+from zope.component import testing
+from Testing import ZopeTestCase as ztc
+from p4a import ploneaudio
+
+from Products.Five import zcml
+from Products.Five import fiveconfigure
+from Products.PloneTestCase import PloneTestCase as ptc
+from Products.PloneTestCase.layer import onsetup, PloneSite
+
+@onsetup
+def load_package_products():
+    import p4a.z2utils
+    import p4a.common
+    import p4a.fileimage
+    import p4a.subtyper
+    import p4a.audio
+    import p4a.ploneaudio
+
+    fiveconfigure.debug_mode = True
+    zcml.load_config('meta.zcml', p4a.subtyper)
+    zcml.load_config('configure.zcml', p4a.subtyper)
+    zcml.load_config('configure.zcml', p4a.common)
+    zcml.load_config('configure.zcml', p4a.fileimage)
+    zcml.load_config('configure.zcml', p4a.audio)
+    zcml.load_config('configure.zcml', p4a.ploneaudio)
+    fiveconfigure.debug_mode = False
+    ztc.installPackage('p4a.ploneaudio')
+
+load_package_products()
+ptc.setupPloneSite(products=['p4a.ploneaudio'])
 
 def test_suite():
     suite = unittest.TestSuite()
-    if __name__ not in ('__main__', 'p4a.ploneaudio.tests.test_functional'):
-        return suite
-    
-    if ploneaudio.has_ataudio_support():
-        from p4a.ploneaudio.ataudio import ataudiotests
-        suite.addTest(ataudiotests.test_suite())
 
-    if ploneaudio.has_fatsyndication_support():
-        suite.addTest(ZopeDocFileSuite(
-            'syndication-integration.txt',
-            package='p4a.ploneaudio',
-            test_class=testing.IntegrationTestCase,
-            optionflags=doctest.ELLIPSIS,
-            )
-        )
+    suite.addTest(ztc.FunctionalDocFileSuite('plone-audio.txt',
+                                             package='p4a.ploneaudio',
+                                             optionflags=doctest.ELLIPSIS,
+                                             test_class=ptc.FunctionalTestCase))
 
-    suite.addTest(ZopeDocFileSuite(
-        'plone-audio.txt',
-        package='p4a.ploneaudio',
-        test_class=testing.testclass_builder(file_type='File')
-        )
-    )
+    suite.addTest(ztc.FunctionalDocFileSuite('syndication-integration.txt',
+                                             package='p4a.ploneaudio',
+                                             optionflags=doctest.ELLIPSIS,
+                                             test_class=ptc.FunctionalTestCase))
 
-    suite.addTest(FunctionalDocFileSuite(
-        'browser.txt',
-        package='p4a.ploneaudio',
-        test_class=testing.testclass_builder()
-        )
-    )
-    
+    suite.addTest(ztc.FunctionalDocFileSuite('browser.txt',
+                                             package='p4a.ploneaudio',
+                                             optionflags=doctest.ELLIPSIS,
+                                             test_class=ptc.FunctionalTestCase))
+
+    import p4a.audio.tests
     pkg_home = Common.package_home({'__name__': 'p4a.audio.tests'})
     samplesdir = os.path.join(pkg_home, 'samples')
-    
+
     fields = dict(
         title=u'Test of the Emercy Broadcast System',
         artist=u'Rocky Burt',
@@ -55,30 +68,18 @@ def test_suite():
         (os.path.join(samplesdir, 'test-no-images.mp3'), 'audio/mpeg', fields),
     )
 
-    for samplefile, mimetype, fields in SAMPLES:
-        suite.addTest(ZopeDocFileSuite(
-            'plone-audio-impl.txt',
-            package='p4a.ploneaudio',
-            test_class=testing.testclass_builder(samplefile=samplefile,
-                                                 required_mimetype=mimetype,
-                                                 file_content_type='File',
-                                                 fields=fields)
-            )
-        )
+    for relsamplefile, mimetype, samplefields in SAMPLES:
+        class MediaTestCase(ptc.FunctionalTestCase):
+            required_mimetype = mimetype
+            samplefile = os.path.join(samplesdir, relsamplefile)
+            file_content_type = 'File'
+            fields = samplefields
 
-    if ploneaudio.has_blobfile_support():
-        # setup the same test to run against BlobFile if available
-        samplefile, mimetype, fields = SAMPLES[0]
-        suite.addTest(ZopeDocFileSuite(
-            'plone-audio-impl.txt',
-            package='p4a.ploneaudio',
-            test_class=testing.testclass_builder(samplefile=samplefile,
-                                                 required_mimetype=mimetype,
-                                                 file_content_type='BlobFile',
-                                                 fields=fields)
-            )
-        )
+        test = ztc.FunctionalDocFileSuite('plone-audio-impl.txt',
+                                          package='p4a.ploneaudio',
+                                          optionflags=doctest.ELLIPSIS,
+                                          test_class=MediaTestCase)
 
-    suite.layer = layer.ZCMLLayer
+        suite.addTest(test)
 
     return suite
