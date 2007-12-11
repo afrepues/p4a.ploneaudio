@@ -235,9 +235,12 @@ def load_metadata(obj, evt):
 
 def sync_audio_metadata(obj, evt):
     """An event handler for saving id3 tag information back onto the file.
+    Also updates annotations.
     """
 
     audio = interfaces.IAudio(obj)
+    annotations = annointerfaces.IAnnotations(obj)
+    annodata = annotations.get(audio.ANNO_KEY, None)
     for description in evt.descriptions:
         if isinstance(description, objectevent.Attributes):
             attrs = description.attributes
@@ -245,6 +248,8 @@ def sync_audio_metadata(obj, evt):
             for key in attrs:
                 if key != 'file' and hasattr(audio, key):
                     orig[key] = getattr(audio, key)
+                    if annodata is not None:
+                        annodata[key] = orig[key]
             if 'file' in attrs:
                 audio._load_audio_metadata()
                 for key, value in orig.items():

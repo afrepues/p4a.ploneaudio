@@ -102,7 +102,7 @@ First we need to open folder view
 
     >>> browser.open(portal_url + '/test-audio-album')
 
-Then we need to upload in to the form
+Then we need to upload it to the form
 
    >>> browser.getLink('File').click()
    >>> browser.getControl(name='title').value = 'Test MP3 File'
@@ -185,6 +185,9 @@ Now we will change all fields
     True
 
 Now the new metadata should be found
+
+    >>> 'First MP3 file with image' in browser.contents
+    True
 
     >>> 'Burt Rocky' in browser.contents
     True
