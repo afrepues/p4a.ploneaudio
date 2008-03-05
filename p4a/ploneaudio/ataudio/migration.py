@@ -19,7 +19,8 @@ class ATAudioMigratable(object):
         orig_id = self.context.getId()
         orig_obj = self.context.aq_base
         
-        file = orig_obj.getRawFile()
+        field = orig_obj.getPrimaryField()
+        file = field.getEditAccessor(orig_obj)()
         if isinstance(file, filewrapper.FileWrapper):
             fd, tempfilename = tempfile.mkstemp('.mp3', 'ATAudioMigratable__temp__')
             f = open(tempfilename, 'wb')

@@ -143,8 +143,9 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
                                           interfaces.IAudioDataAccessor,
                                           unicode(mime_type))
         if accessor is not None:
+            field = self.context.getPrimaryField()
             filename = fileutils.write_ofsfile_to_tempfile \
-                       (self.context.getRawFile())
+                       (field.getEditAccessor(self.context)())
             accessor.load(filename)
             os.remove(filename)
 
@@ -158,11 +159,12 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
                                           interfaces.IAudioDataAccessor,
                                           unicode(mime_type))
         if accessor is not None:
+            field = self.context.getPrimaryField()
             filename = fileutils.write_ofsfile_to_tempfile \
-                       (self.context.getRawFile())
+                       (field.getEditAccessor(self.context)())
             accessor.store(filename)
 
-            zodb_file = self.context.getRawFile()
+            zodb_file = field.getEditAccessor(self.context)()
             fin = open(filename, 'rb')
             # very inefficient, loading whole file in memory upon upload
             # TODO: fix in-memory loading
@@ -173,10 +175,12 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
             os.remove(filename)
 
     def _get_file(self):
-        return self.context.getRawFile()
+        field = self.context.getPrimaryField()
+        return field.getEditAccessor(self.context)()
     def _set_file(self, v):
         if v != interfaces.IAudio['file'].missing_value:
-            self.context.getRawFile().manage_upload(file=v)
+            field = self.context.getPrimaryField()
+            field.getMutator(self.context)(v)
     file = property(_get_file, _set_file)
 
     @property
