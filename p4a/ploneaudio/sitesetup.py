@@ -63,13 +63,17 @@ def setup_indexes(portal):
         print >>out, 'The FieldIndex "audio_genre_id" was successfully created'
 
     if not 'audio_artist' in pc.indexes():
-
         extra = SimpleRecord(lexicon_id='plaintext_lexicon',
                              index_type='Okapi BM25 Rank')
 
         pc.addIndex('audio_artist', 'ZCTextIndex', extra)
         pc.manage_reindexIndex('audio_artist')
         print >>out, 'The ZCTextIndex "audio_artist" was successfully created'
+
+    if not 'audio_track' in pc.indexes():
+        pc.addIndex('audio_track', 'FieldIndex')
+        pc.manage_reindexIndex('audio_track')
+        print >>out, 'The FieldIndex "audio_track" was successfully created'
 
     if not 'Format' in pc.indexes():
         pc.addIndex('Format', 'FieldIndex')

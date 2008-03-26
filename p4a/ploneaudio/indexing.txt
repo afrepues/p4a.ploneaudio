@@ -86,3 +86,18 @@ an object with no ``IAudio`` adapter.
     Traceback (most recent call last):
       ...
     AttributeError
+
+And same thing for the track number:
+
+    >>> audiofile.idtrack = 7
+    >>> indexing.audio_track(audiofile, None)
+    7
+
+Again, the ``audio_track`` function will yield an AttributeError when used on
+an object with no ``IAudio`` adapter.
+
+    >>> indexing.audio_track(basicfile, None)
+    Traceback (most recent call last):
+      ...
+    AttributeError
+ 
