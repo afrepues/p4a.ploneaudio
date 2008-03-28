@@ -54,13 +54,13 @@ sure that it has all appropriate interfaces.
     []
     >>> sitesetup.setup_indexes(site)
     >>> sorted(catalog.indexes())
-    ['Format', 'audio_artist', 'audio_genre_id', 'object_provides']
+    ['Format', 'audio_artist', 'audio_genre_id', 'audio_track', 'object_provides']
 
 And of course running it a second time should be completely harmless.
 
     >>> sitesetup.setup_indexes(site)
     >>> sorted(catalog.indexes())
-    ['Format', 'audio_artist', 'audio_genre_id', 'object_provides']
+    ['Format', 'audio_artist', 'audio_genre_id', 'audio_track', 'object_provides']
 
 Metadata Columns
 ----------------
