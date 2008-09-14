@@ -3,6 +3,7 @@
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:zcml="http://namespaces.zope.org/zcml">
 
+  <include package="p4a.common" />
   <include package="p4a.audio" />
   
   <class class="Products.ATContentTypes.content.topic.ATTopic">
