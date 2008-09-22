@@ -1,3 +1,5 @@
+.. -*-doctest-*-
+
 ====================================
 Plone4Artists Audio Plone Functional
 ====================================
@@ -31,11 +33,7 @@ Smart Folders
 Start by creating a new smart folder.
 
     >>> browser.open(portal_url)
-    >>> try:
-    ...     addtopic = browser.getLink('Smart Folder')
-    ... except:
-    ...     # support for Plone 3.0
-    ...     addtopic = browser.getLink('Collection')
+    >>> addtopic = browser.getLink('Collection')
     >>> addtopic.click()
     >>> browser.getControl(name='title').value = 'Test Smart Audio Album'
     >>> browser.getControl('Save').click()
@@ -45,17 +43,8 @@ At this point we're inside an empty smart folder.  The first test here is to
 is necessary to go through the 'Display' form as test browser cannot follow
 the Javascript links in Plone.
 
-    >>> browser.open(portal_url + '/test-smart-audio-album/media-config.html')
-    >>> browser.getLink('Display').click()
-    >>> browser.getControl('Album view').click()
-    >>> browser.getControl('Save').click()
-    
+    >>> browser.getLink('Audio Container').click()
 
-Since the album/smart-folder is currently empty, the total length amount should
-be zero.
-
-    >>> 'Audio information unavailable' in browser.contents
-    True
 
 Audio Folders
 -------------
@@ -70,16 +59,7 @@ We begin by setting up a test folder.
 At this point we're inside an empty folder.  The first test here is to
 *audio activate* this folder.
 
-    >>> browser.open(portal_url + '/test-audio-album/media-config.html')
-    >>> browser.getLink('Display').click()
-    >>> browser.getControl('Album view').click()
-    >>> browser.getControl('Save').click()
-
-Since the album/folder is currently empty, the total length amount should
-be zero.
-
-    >>> 'Audio information unavailable' in browser.contents
-    True
+    >>> browser.getLink('Audio Container').click()
 
 Since we have a folder we will add new mp3 file. First create file object:
 
@@ -253,32 +233,9 @@ Test if there is a Title
     >>> 'Emergencies All Around Us' in browser.contents
     True
 
-Test if there is a Year.
-    >>> '2007' in browser.contents
-    True
-
-Test if there is a track number (TRACKNUMBER)
-    >>> '01' in browser.contents
-    True
-
-The following tests are not working yet, because we need to add support for this metadata.
-
-Test if there is a track total (TRACKTOTAL)
-     '10' in browser.contents
-    True
-
-Test if there is a Comment (Ogg calls this DESCRIPTION)
-    'Coming to you live from Gander, Newfoundland.' in browser.contents
-    True
-    
 Test if there is a Genre
     'Vocal' in browser.contents
     True
-
-Test if there is a Composer
-    'Nate Aune' in browser.contents
-    True
-
 
 Test if there is the file metadata.
     >>> '60.5 kB' in browser.contents
@@ -300,22 +257,6 @@ Test if there is the file metadata.
 Now we are going up to test-audio-album folder
 
     >>> browser.open(portal_url + '/test-audio-album')
-
-And check if we get actual data
-
-    >>> '<td>00:03</td>' in browser.contents
-    True
-    
-    >>> 'Test of the Emercy Broadcast System' in browser.contents
-    True
-
-
-
-Finally we should be able to open the file again
-
-    >>> browser.getLink('Test of the Emercy Broadcast System').click()
-    >>> 'Test of the Emercy Broadcast System' in browser.contents
-    True
 
 
 Comments garbled / encoding issues: issue #21

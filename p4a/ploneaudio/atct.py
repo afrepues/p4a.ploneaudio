@@ -242,7 +242,12 @@ def sync_audio_metadata(obj, evt):
     Also updates annotations.
     """
 
-    audio = interfaces.IAudio(obj)
+    if interfaces.IAudio.providedBy(obj):
+        audio = obj
+        obj = obj.context
+    else:
+        audio = interfaces.IAudio(obj)
+
     annotations = annointerfaces.IAnnotations(obj)
     annodata = annotations.get(audio.ANNO_KEY, None)
     for description in evt.descriptions:

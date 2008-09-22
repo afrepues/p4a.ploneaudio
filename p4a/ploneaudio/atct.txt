@@ -1,3 +1,5 @@
+.. -*-doctest-*-
+
 ATContentTypes Support
 ======================
 
@@ -197,7 +199,6 @@ that tries to make sure the content is sane.
     ...     descriptions = [objectevent.Attributes(interfaces.IAudio,
     ...                                            'title', 'file')]
     >>> atct.sync_audio_metadata(audio, MockEvent())
-    >>> 
 
 Attempting Media Activation
 ---------------------------
