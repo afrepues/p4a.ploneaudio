@@ -33,6 +33,6 @@ setup(name='p4a.ploneaudio',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'p4a.audio>=1.1dev',
+          'p4a.audio>=1.1b1',
           ],
       )
