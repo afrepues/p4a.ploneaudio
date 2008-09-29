@@ -29,11 +29,6 @@ Podcasting support
   contents broadcast using RSS with enclosures representing the individual 
   audio files.
 
-External filesystem storage support
-  By default all audio content is stored directly within the ZODB, but 
-  by using the BlobFile_ product all audio content can be stored 
-  automatically outside the ZODB on the filesystem.
-
 Content Licensing support
   All audio content can automatically be licensed using the ContentLicensing_
   product.
@@ -84,6 +79,7 @@ Here are step-by-step instruction for creating three commonly used audio
 smart folders:
 
   1. A smart folder containing all audio files from the whole site:
+
     i) Create a smart folder, give it a Title and save it
     ii) Audio-activate the smart folder in the **actions** drop down menu
     iii) Click the **criteria** tab 
@@ -95,6 +91,7 @@ smart folders:
 
   2. A smart folder containing all audio by a particular artist (repeat all
      steps from #1):
+
     i) In the *Add New Search Criteria* box, set *Field name* to *Artist name*
     ii) Click *add*
     iii) In the *criterion details* column set *Value* for Artist name to the
@@ -104,6 +101,7 @@ smart folders:
 
   3. A smart folder containing all audio of a particular genre (repeat all
      steps from #1):
+
     i) In the *Add New Search Criteria* box, set *Field name* to *Genre*
     ii) Click *add*
     iii) Enter the number that corresponds to the genre. For a list of genres
