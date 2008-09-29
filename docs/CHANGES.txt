@@ -2,8 +2,10 @@
 p4a.ploneaudio Changes
 ======================
 
-p4a.ploneaudio trunk (unreleased)
+p4a.ploneaudio 1.1b1 (2008-09-29)
 =================================
+
+* Supports Plone 3.0.x and 3.1.x
 
 * An audio_track index is now added, for sorting audio tracks.
 
