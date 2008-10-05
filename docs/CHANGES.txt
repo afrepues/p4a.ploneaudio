@@ -1,9 +1,15 @@
+.. -*-rst-*-
+
 ======================
 p4a.ploneaudio Changes
 ======================
 
 p4a.ploneaudio 1.1b1 (2008-09-29)
 =================================
+
+* Fixed #10: updated readme
+
+* Fixed #140: Tests now passing on Plone 3.0.6 and 3.1.5.1
 
 * Supports Plone 3.0.x and 3.1.x
 
