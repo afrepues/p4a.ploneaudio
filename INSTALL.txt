@@ -23,10 +23,10 @@ Buildout
 --------
 
   1. Add p4a.ploneaudio to the eggs param of the [buildout] section
-     (ie eggs=p4a.ploneaudio)
+     (ie ``eggs=p4a.ploneaudio``)
 
   2. Add p4a.ploneaudio to zcml param of the [instance] section
-     (ie: zcml=p4a.ploneaudio)
+     (ie: ``zcml=p4a.ploneaudio``)
 
 Optional Steps
 ==============
@@ -36,3 +36,12 @@ Content Rating
 
 Add the PloneContentRatings product to the instance's products dir.  The
 functionality will automatically be added.
+
+Syndication
+-----------
+
+Add the following to the instances products dirs:
+
+  - Products.basesyndication
+
+  - Products.fatsyndication
