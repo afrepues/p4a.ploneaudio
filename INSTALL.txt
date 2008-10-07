@@ -37,6 +37,13 @@ Content Rating
 Add the PloneContentRatings product to the instance's products dir.  The
 functionality will automatically be added.
 
+Tagging
+-------
+
+Add the lovely.tag egg from
+svn://svn.zope.org/repos/main/lovely.tag/branches/serverzen-z32-support and
+include it's zcml slug.
+
 Syndication
 -----------
 
