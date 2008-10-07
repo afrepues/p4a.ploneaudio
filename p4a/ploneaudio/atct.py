@@ -1,11 +1,7 @@
 import os
 import Acquisition
 from OFS import Image as ofsimage
-try:
-    from zope.app.annotation import interfaces as annointerfaces
-except ImportError, err:
-    # Zope 2.10 support
-    from zope.annotation import interfaces as annointerfaces
+from zope.annotation import interfaces as annointerfaces
 
 from zope import component
 from zope import interface
@@ -17,24 +13,21 @@ from p4a.audio import utils
 
 from p4a.common.descriptors import atfield
 
-from p4a.fileimage import file as p4afile
 from p4a.fileimage import utils as fileutils
 
-from Products.ATContentTypes import interface as atctifaces  
+from Products.ATContentTypes import interface as atctifaces
 from Products.CMFCore import utils as cmfutils
-from Products.CMFPlone.CatalogTool import registerIndexableAttribute
-
-from zope.component import queryAdapter
 
 import logging
 logger = logging.getLogger('p4a.ploneaudio.atct')
 
 DEFAULT_CHARSET = 'utf-8'
 
+
 class ATCTFolderAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
     component.adapts(atctifaces.IATFolder)
-    
+
     def __init__(self, context):
         self.context = context
 
@@ -48,14 +41,16 @@ class ATCTFolderAudioProvider(object):
 
         return files
 
+
 class ATCTBTreeFolderAudioProvider(ATCTFolderAudioProvider):
     interface.implements(interfaces.IAudioProvider)
     component.adapts(atctifaces.IATBTreeFolder)
 
+
 class ATCTTopicAudioProvider(object):
     interface.implements(interfaces.IAudioProvider)
     component.adapts(atctifaces.IATTopic)
-    
+
     def __init__(self, context):
         self.context = context
 
@@ -69,7 +64,9 @@ class ATCTTopicAudioProvider(object):
 
         return files
 
+
 class I18NMixin(object):
+
     @property
     def _default_charset(self):
         """The charset determined by the active Plone site to be the
@@ -94,12 +91,14 @@ class I18NMixin(object):
 
         return utils.unicodestr(v, self._default_charset)
 
+
 @interface.implementer(interfaces.IAudio)
 @component.adapter(atctifaces.IATFile)
 def ATCTFileAudio(context):
     if not interfaces.IAudioEnhanced.providedBy(context):
         return None
     return _ATCTFileAudio(context)
+
 
 class ImageMixin(object):
     """Supports image field setting and getting."""
@@ -109,6 +108,7 @@ class ImageMixin(object):
         if v == None or v.get_size() == 0:
             return None
         return v
+
     def _set_audio_image(self, v):
         if v == interfaces.IAudio['audio_image'].missing_value:
             return
@@ -116,11 +116,12 @@ class ImageMixin(object):
         if isinstance(upload, ofsimage.Image):
             image = upload
         else:
-            image = ofsimage.Image(id=upload.filename, 
-                                   title=upload.filename, 
+            image = ofsimage.Image(id=upload.filename,
+                                   title=upload.filename,
                                    file=upload)
         self.audio_data['audio_image'] = image
     audio_image = property(_get_audio_image, _set_audio_image)
+
 
 class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
     """An IAudio adapter designed to handle ATCT based file content."""
@@ -139,13 +140,13 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
         """
 
         mime_type = self.context.get_content_type()
-        accessor = component.queryAdapter(self.context, 
+        accessor = component.queryAdapter(self.context,
                                           interfaces.IAudioDataAccessor,
                                           unicode(mime_type))
         if accessor is not None:
             field = self.context.getPrimaryField()
-            filename = fileutils.write_ofsfile_to_tempfile \
-                       (field.getEditAccessor(self.context)())
+            filename = fileutils.write_ofsfile_to_tempfile(
+                           field.getEditAccessor(self.context)())
             accessor.load(filename)
             os.remove(filename)
 
@@ -155,13 +156,13 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
         """
 
         mime_type = self.context.get_content_type()
-        accessor = component.queryAdapter(self.context, 
+        accessor = component.queryAdapter(self.context,
                                           interfaces.IAudioDataAccessor,
                                           unicode(mime_type))
         if accessor is not None:
             field = self.context.getPrimaryField()
-            filename = fileutils.write_ofsfile_to_tempfile \
-                       (field.getEditAccessor(self.context)())
+            filename = fileutils.write_ofsfile_to_tempfile(
+                           field.getEditAccessor(self.context)())
             accessor.store(filename)
 
             zodb_file = field.getEditAccessor(self.context)()
@@ -177,6 +178,7 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
     def _get_file(self):
         field = self.context.getPrimaryField()
         return field.getEditAccessor(self.context)()
+
     def _set_file(self, v):
         if v != interfaces.IAudio['file'].missing_value:
             field = self.context.getPrimaryField()
@@ -186,7 +188,7 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
     @property
     def audio_type(self):
         mime_type = self.context.get_content_type()
-        accessor = component.getAdapter(self.context, 
+        accessor = component.getAdapter(self.context,
                                         interfaces.IAudioDataAccessor,
                                         unicode(mime_type))
         return accessor.audio_type
@@ -194,6 +196,7 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
     def __str__(self):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
+
 
 class _ATCTFolderishAudioContainer(ImageMixin,
                                    audioanno.AnnotationAudioContainer,
@@ -210,12 +213,14 @@ class _ATCTFolderishAudioContainer(ImageMixin,
         return '<p4a.audio ATCTFolderishAudio title=%s>' % self.title
     __repr__ = __str__
 
+
 @interface.implementer(interfaces.IAudioContainer)
 @component.adapter(atctifaces.IATFolder)
 def ATCTFolderAudioContainer(context):
     if not interfaces.IAudioContainerEnhanced.providedBy(context):
         return None
     return _ATCTFolderishAudioContainer(context)
+
 
 @interface.implementer(interfaces.IAudioContainer)
 @component.adapter(atctifaces.IATTopic)
@@ -224,6 +229,7 @@ def ATCTTopicAudioContainer(context):
         return None
     return _ATCTFolderishAudioContainer(context)
 
+
 @interface.implementer(interfaces.IAudioContainer)
 @component.adapter(atctifaces.IATBTreeFolder)
 def ATCTBTreeFolderAudioContainer(context):
@@ -231,11 +237,13 @@ def ATCTBTreeFolderAudioContainer(context):
         return None
     return _ATCTFolderishAudioContainer(context)
 
+
 def load_metadata(obj, evt):
     """An event handler for loading metadata.
     """
 
     obj._load_audio_metadata()
+
 
 def sync_audio_metadata(obj, evt):
     """An event handler for saving id3 tag information back onto the file.
@@ -265,6 +273,7 @@ def sync_audio_metadata(obj, evt):
                     setattr(audio, key, value)
     audio._save_audio_metadata()
 
+
 def attempt_media_activation(obj, evt):
     """Try to activiate the media capabilities of the given object.
     """
@@ -287,6 +296,7 @@ def attempt_media_activation(obj, evt):
         update_dublincore(obj, evt)
         update_catalog(obj, evt)
 
+
 def update_dublincore(obj, evt):
     """Update the dublincore properties.
     """
@@ -296,11 +306,13 @@ def update_dublincore(obj, evt):
     data = annotations.get(audio.ANNO_KEY, None)
     obj.setTitle(data.get('title', u''))
 
+
 def update_catalog(obj, evt):
     """Reindex the object in the catalog.
     """
 
     obj.reindexObject()
+
 
 def feature_activated(evt):
     if evt.enhancedinterface is interfaces.IAudioContainerEnhanced:
