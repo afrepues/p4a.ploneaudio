@@ -3,22 +3,19 @@ import doctest
 import unittest
 from App import Common
 
-from zope.testing import doctestunit
-from zope.component import testing
 from Testing import ZopeTestCase as ztc
-from p4a import ploneaudio
 
 from Products.Five import zcml
 from Products.Five import fiveconfigure
 from Products.PloneTestCase import PloneTestCase as ptc
-from Products.PloneTestCase.layer import onsetup, PloneSite
+from Products.PloneTestCase.layer import onsetup
+
 
 @onsetup
 def load_package_products():
     import p4a.z2utils
     import p4a.common
     import p4a.fileimage
-    import p4a.subtyper
     import p4a.audio
     import p4a.ploneaudio
 
@@ -34,6 +31,7 @@ def load_package_products():
 
 load_package_products()
 ptc.setupPloneSite(products=['p4a.ploneaudio'])
+
 
 def test_suite():
     suite = unittest.TestSuite()
