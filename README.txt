@@ -1,10 +1,11 @@
 .. -*-rst-*-
 
+===================
 Plone4Artists Audio
 ===================
 
 Overview
---------
+========
 
 The p4a.ploneaudio egg is a Plone product built to expose the ``p4a.audio``
 framework in a Plone setting.  In a nutshell it provides the following
@@ -36,13 +37,13 @@ Content Licensing support
   product.
 
 Requirements
-------------
+============
 
 - Zope 2.10.x
 - Plone 3.0.x or 3.1.x (3.0.6 and 3.1.5.1 tested)
 
 Optional Dependencies
----------------------
+=====================
 
 Licensing Support
   - ContentLicensing_ 1.0.2 or higher
@@ -56,13 +57,16 @@ Podcasting Support
 .. _fatsyndication: https://svn.plone.org/svn/collective/fatsyndication/
 
 Installation
-------------
+============
 
-Install the p4a.ploneaudio egg and all of it's dependencies and
-include the p4a.ploneaudio zcml slug in your zope2 instance.
+1. Add p4a.ploneaudio to the list of eggs (for buildout: eggs=p4a.ploneaudio)
+
+2. Add p4a.ploneaudio to zcml slugs (for buildout: zcml=p4a.ploneaudio)
+
+For info on setting up the optional dependencies please see INSTALL.txt
 
 Basic Usage
------------
+===========
 
 - files with mime types ``audio/mpeg`` or ``application/ogg`` will
   automatically become *audio enhanced*
@@ -72,7 +76,7 @@ Basic Usage
   menus.
 
 Smart Folders
--------------
+=============
 You can use audio enhanced smart folders to display audio from across your
 site. Which audio files appear in your smart folder depends on the criteria
 you specify in the **criteria** drop down menu of the smart folder.
