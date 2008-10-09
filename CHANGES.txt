@@ -4,6 +4,12 @@
 p4a.ploneaudio Changes
 ======================
 
+p4a.ploneaudio 1.1rc1 (2008-10-09)
+==================================
+
+* Updated README.txt and INSTALL.txt docs
+
+
 p4a.ploneaudio 1.1b1 (2008-09-29)
 =================================
 
