@@ -38,6 +38,9 @@ class ATCTFolderAudioProvider(object):
             adapted = component.queryAdapter(x, interfaces.IAudio)
             if adapted is not None:
                 files.append(adapted)
+         
+        # Sort albums by track id
+        files.sort(key=lambda obj: obj.idtrack.zfill(30))
 
         return files
 
