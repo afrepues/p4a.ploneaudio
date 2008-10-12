@@ -7,6 +7,10 @@ Plone4Artists Audio Plone Functional
 This functional test assumes a plone site has already been installed
 and that we're ready to actually start dealing with audio files.
 
+To run the test, type from the command line at the root:
+
+    $ ./bin/test-audio
+
 Set Up
 ======
 
@@ -159,6 +163,7 @@ Now we will change all fields
     >>> browser.getControl(name='form.file').mech_control.add_file(StringIO())
     >>> browser.getControl(name='form.audio_image').mech_control.add_file(StringIO())
     >>> browser.getControl(name='form.comment').value = 'A test made durring Sorrento Sprint.'
+    >>> browser.getControl(name='form.idtrack').value = '0'  
     >>> browser.getControl(name='form.actions.apply').click()
 
     >>> 'Successfully updated' in browser.contents
@@ -357,3 +362,68 @@ video-strings present.
     False
     >>> 'video-config.html' in browser.contents
     False
+
+Provide alternative displays of ordering the audio tracks: issue #37
+=============================================================================
+
+We should allow users to have the ability to either order things by tracks
+or by collection criteria.
+
+We assume that album folder is created and audio activated.
+    
+First we change the track id on a number of tracks.  We add track IDs values so
+the tracks should list in opposite order of how they were added.
+
+  >>> browser.open(portal_url + '/test-audio-album/test-full.mp3/edit')
+  >>> browser.getControl(name='form.idtrack').value = '213'
+  >>> browser.getControl(name='form.actions.apply').click()
+
+  >>> browser.open(portal_url + '/test-audio-album/test-full-dummy-genre.mp3/edit')
+  >>> browser.getControl(name='form.idtrack').value = '0101'
+  >>> browser.getControl(name='form.actions.apply').click()      
+  
+Open the album in standard album view and check for track id columns
+  
+  >>> browser.open(portal_url + '/test-audio-album/selectViewTemplate?templateId=audio-album.html')
+  >>> '<th class="nosort">#</th>' in browser.contents
+  True
+  
+Test if the  sorted by those columns.
+
+  >>> browser.contents.index('0101') < browser.contents.index('213')
+  True
+  
+Now we create a play list (aka smartfolder/collection/topic)
+
+  >>> browser.open(portal_url + '/createObject?type_name=Topic')
+  >>> browser.getControl(name='title').value = 'Test Audio Playlist'  
+  >>> browser.getControl(name='description').value = 'Test description'  
+  >>> browser.getControl(name='form_submit').click()    
+  
+Add some criteria so we have content inside our playlist
+We make the criteria fetch a specific type, in this case file objects.
+  
+  >>> target = '/criterion_edit_form?field=Type&criterion_type=ATPortalTypeCriterion&form.submitted=1&form.button.AddCriterion=Add+criteria'
+  >>> browser.open(portal_url + '/test-audio-playlist' + target)  
+  >>> browser.open(portal_url + '/test-audio-playlist/criterion_edit_form')  
+  >>> form = browser.getForm(index=1)
+  >>> ctrl = form.getControl(name='crit__Type_ATPortalTypeCriterion_value:list')
+  >>> ctrl.getControl('File').selected = True
+  >>> form.getControl(name='form.button.Save').click()
+  
+We fire off the TopicAudioContainer subtype on our playlist
+  
+  >>> browser.open(portal_url + '/test-audio-playlist/@@subtyper/change_type?subtype=p4a.audio.TopicAudioContainer')
+ 
+Test that the smart folder is sorted by how the content was added rather than sorting
+by track ids.
+
+  >>> browser.open(portal_url + '/test-audio-playlist/selectViewTemplate?templateId=audio-album.html')
+  >>> browser.contents.index('0101') < browser.contents.index('213')
+  False
+    
+Now we open the folder view in the album view without track numbers and confirm it.
+  >>> template = '?templateId=audio-album-no-track-id.html'
+  >>> browser.open(portal_url + '/test-audio-album/selectViewTemplate' + template)
+  >>> '<th class="nosort">#</th>' in browser.contents
+  False

@@ -39,8 +39,14 @@ class ATCTFolderAudioProvider(object):
             if adapted is not None:
                 files.append(adapted)
          
-        # Sort albums by track id
-        files.sort(key=lambda obj: obj.idtrack.zfill(30))
+        # Sort albums by track id.
+        try:
+            files.sort(key=lambda obj: obj.idtrack.zfill(30))
+        except AttributeError:
+            # Don't do sort if album is empty because the lambda above breaks
+            # A check via file list size (if files) doesn't work
+            # So we do an AttributeError pass through
+            pass
 
         return files
 
