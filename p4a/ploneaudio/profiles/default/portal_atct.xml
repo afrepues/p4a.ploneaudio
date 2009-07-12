@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<atcttool
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+ <topic_indexes i18n:domain="plone">
+  <index name="audio_artist"
+     description="The name of the artist."
+     enabled="True" friendlyName="Artist name">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="audio_genre_id"
+     description="The genre id of the song."
+     enabled="True" friendlyName="Genre">
+   <criteria>ATSimpleIntCriterion</criteria>
+  </index>
+  <index name="Format"
+     description="The MIME type of the file.  For an MP3 file, this is audio/mpeg."
+     enabled="True" friendlyName="MIME Types">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+ </topic_indexes>
+ <topic_metadata i18n:domain="plone">
+  <metadata name="audio_artist"
+     description="The name of the artist."
+     enabled="True" friendlyName="Artist name" />
+  <metadata name="audio_genre_id"
+     description="The genre id of the song."
+     enabled="True" friendlyName="Genre" />
+  <metadata name="Format"
+     description="The MIME type of the file.  For an MP3 file, this is audio/mpeg."
+     enabled="True" friendlyName="MIME Types" />
+ </topic_metadata>
+</atcttool>

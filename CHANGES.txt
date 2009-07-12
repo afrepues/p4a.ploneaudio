@@ -4,6 +4,12 @@
 p4a.ploneaudio Changes
 ======================
 
+p4a.ploneaudio 1.1rc2 (2009-07-12)
+==================================
+
+* Move catalog index and metadata setup into the GS profile.  Resolves
+  an issue with refreshCatalog being called for very large sites.
+
 p4a.ploneaudio 1.1rc1 (2008-10-09)
 ==================================
 
