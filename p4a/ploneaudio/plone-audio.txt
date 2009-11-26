@@ -7,6 +7,7 @@ and wrapping it with a Plone integration layer.
 We begin this process by creating a new instance of a file content
 type.
 
+  >>> self.loginAsPortalOwner()
   >>> id = self.folder.invokeFactory('File', 'testfile1')
   >>> testfile1 = self.folder[id]
 
@@ -31,7 +32,7 @@ this file instance.
     
 This is what the testfile looks like before adaptation to IAudio
   >>> testfile1
-  <ATFile at /plone/Members/test_user_1_/testfile1>
+  <AT... at /plone/Members/test_user_1_/testfile1>
 
 
 Now adapting it should work fine.
@@ -92,7 +93,7 @@ this file instance.
     
 This is what the testfile looks like before adaptation to IAudio
   >>> testfile2
-  <ATFile at /plone/Members/test_user_1_/testfolder1/testfile2>
+  <AT... at /plone/Members/test_user_1_/testfolder1/testfile2>
 
 Now adapting it should work fine.
 

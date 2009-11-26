@@ -32,7 +32,25 @@ setup(name='p4a.ploneaudio',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          'setuptools',
           'p4a.audio>=1.1dev',
+          'p4a.common',
+          'p4a.fileimage',
+          'p4a.subtyper',
+          'p4a.z2utils',
+          'setuptools',
+          'zope.annotation',
+          'zope.app.event',
+          'zope.component',
+          'zope.event',
+          'zope.interface',
+          'zope.schema'
           ],
+      extras_require=dict(tests=[
+          'Products.fatsyndication',
+          'Products.MimeTypesRegistry',
+          'Products.PloneTestCase',
+          'zope.app.annotation',
+          'zope.publisher',
+          'plone.app.blob'
+      ]),
       )

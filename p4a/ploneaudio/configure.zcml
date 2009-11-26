@@ -6,6 +6,7 @@
 
   <include package="p4a.common" />
   <include package="p4a.audio" />
+  <include package=".blob" />
   
   <class class="Products.ATContentTypes.content.topic.ATTopic">
       <implements interface="p4a.audio.interfaces.IPossibleAudioContainer" />

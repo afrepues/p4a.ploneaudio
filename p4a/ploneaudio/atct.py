@@ -18,6 +18,8 @@ from p4a.fileimage import utils as fileutils
 from Products.ATContentTypes import interface as atctifaces
 from Products.CMFCore import utils as cmfutils
 
+from plone.app.blob.interfaces import IATBlob
+
 import logging
 logger = logging.getLogger('p4a.ploneaudio.atct')
 
@@ -106,8 +108,10 @@ class I18NMixin(object):
 def ATCTFileAudio(context):
     if not interfaces.IAudioEnhanced.providedBy(context):
         return None
-    return _ATCTFileAudio(context)
-
+    if IATBlob.providedBy(context):
+        return _ATCTBlobAudio(context)
+    else:
+        return _ATCTFileAudio(context)
 
 class ImageMixin(object):
     """Supports image field setting and getting."""
@@ -132,16 +136,16 @@ class ImageMixin(object):
     audio_image = property(_get_audio_image, _set_audio_image)
 
 
-class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
+class _ATBaseAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
     """An IAudio adapter designed to handle ATCT based file content."""
 
     interface.implements(interfaces.IAudio)
-    component.adapts(atctifaces.IATFile)
-
-    ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFileAudio'
 
     title = atfield('title', 'context')
     description = atfield('description', 'context')
+
+    def __init__(self, context, *args, **kwargs):
+        super(_ATBaseAudio, self).__init__(context)
 
     def _load_audio_metadata(self):
         """Retrieve audio metadata from the raw file data and update
@@ -206,6 +210,28 @@ class _ATCTFileAudio(ImageMixin, audioanno.AnnotationAudio, I18NMixin):
         return '<p4a.audio ATCTFileAudio title=%s>' % self.title
     __repr__ = __str__
 
+class _ATCTFileAudio(_ATBaseAudio):
+    component.adapts(atctifaces.IATFile)
+
+    ANNO_KEY = 'p4a.ploneaudio.atct.ATCTFileAudio'
+
+class _ATCTBlobAudio(_ATBaseAudio):
+    component.adapts(IATBlob)
+
+    def _load_audio_metadata(self):
+        """Retrieve audio metadata from the raw file data and update
+        this object's appropriate metadata fields.
+        """
+
+        mime_type = self.context.get_content_type()
+        accessor = component.queryAdapter(self.context,
+                                          interfaces.IAudioDataAccessor,
+                                          unicode(mime_type))
+        if accessor is not None:
+            field = self.context.getPrimaryField()
+            filename = field.getAccessor(self.context)().getBlob().open().name
+            accessor.load(filename)
+            os.remove(filename)
 
 class _ATCTFolderishAudioContainer(ImageMixin,
                                    audioanno.AnnotationAudioContainer,

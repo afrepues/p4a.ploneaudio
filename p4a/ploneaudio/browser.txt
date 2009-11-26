@@ -29,6 +29,7 @@ And of course we get the test browser.
     >>> import Products.Five.testbrowser
     >>> portal_url = portal.absolute_url()
     >>> browser = Products.Five.testbrowser.Browser()
+    >>> browser.handleErrors = False
     >>> browser.addHeader('Authorization', 'Basic admin:admin')
 
 Smart Folders
@@ -98,7 +99,7 @@ Then we need to upload it to the form
 
 Finally save the form and close the file.
 
-   >>> browser.getControl(name='form_submit').click()
+   >>> browser.getControl('Save').click()
    >>> mp3.close()
    
 
@@ -227,7 +228,7 @@ Then we need to upload in to the form
 
 Finally save the form and close the file.
 
-    >>> browser.getControl(name='form_submit').click()
+    >>> browser.getControl('Save').click()
     >>> ogg.close()
 
 Test if there is an Artist
@@ -288,7 +289,7 @@ Then we need to upload in to the form
 
 Finally save the form and close the file.
 
-    >>> browser.getControl(name='form_submit').click()
+    >>> browser.getControl('Save').click()
     >>> u_mp3.close()
 
 Now check file's title and comment
@@ -325,7 +326,7 @@ Then we need to upload in to the form
 
 Finally save the form and close the file.
 
-    >>> browser.getControl(name='form_submit').click()
+    >>> browser.getControl('Save').click()
     >>> dummy_genre.close()
 
 Now check file's genre to make sure that it is empty.
@@ -347,7 +348,7 @@ Visit the homepage, add a large folder, and finally audio-activiate it.
     >>> browser.open(portal_url)
     >>> browser.getLink('Large Folder').click()
     >>> browser.getControl(name='title').value = 'Large Music Folder'
-    >>> browser.getControl(name='form_submit').click()
+    >>> browser.getControl('Save').click()
     >>> browser.getLink(url='change_type?subtype=p4a.audio.').click()
 
 
@@ -390,7 +391,7 @@ Open the album in standard album view and check for track id columns
   
 Test if the  sorted by those columns.
 
-  >>> browser.contents.index('0101') < browser.contents.index('213')
+  >>> browser.contents.index('<td>0101</td>') < browser.contents.index('<td>213</td>')
   True
   
 Now we create a play list (aka smartfolder/collection/topic)
@@ -398,7 +399,7 @@ Now we create a play list (aka smartfolder/collection/topic)
   >>> browser.open(portal_url + '/createObject?type_name=Topic')
   >>> browser.getControl(name='title').value = 'Test Audio Playlist'  
   >>> browser.getControl(name='description').value = 'Test description'  
-  >>> browser.getControl(name='form_submit').click()    
+  >>> browser.getControl('Save').click()    
   
 Add some criteria so we have content inside our playlist
 We make the criteria fetch a specific type, in this case file objects.

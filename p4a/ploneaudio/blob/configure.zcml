@@ -1,0 +1,11 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <class class="plone.app.blob.content.ATBlob">
+    <implements interface="p4a.audio.interfaces.IPossibleAudio" />
+  </class>
+
+  <adapter factory=".atct.getATBlobFilename" />
+  <adapter factory=".atct.ATCTFileAudio" />
+
+</configure>
