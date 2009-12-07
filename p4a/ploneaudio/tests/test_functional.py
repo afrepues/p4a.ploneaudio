@@ -18,6 +18,7 @@ def load_package_products():
     import p4a.fileimage
     import p4a.audio
     import p4a.ploneaudio
+    import p4a.subtyper
 
     fiveconfigure.debug_mode = True
     zcml.load_config('meta.zcml', p4a.subtyper)

@@ -231,7 +231,22 @@ class _ATCTBlobAudio(_ATBaseAudio):
             field = self.context.getPrimaryField()
             filename = field.getAccessor(self.context)().getBlob().open().name
             accessor.load(filename)
-            os.remove(filename)
+
+    def _save_audio_metadata(self):
+        """Write the audio metadata fields of this object as metadata
+        on the raw file data.
+        """
+
+        mime_type = self.context.get_content_type()
+        accessor = component.queryAdapter(self.context,
+                                          interfaces.IAudioDataAccessor,
+                                          unicode(mime_type))
+        if accessor is not None:
+            field = self.context.getPrimaryField()
+            blob_wrapper = field.getAccessor(self.context)()
+            filename = blob_wrapper.getBlob().open('r+').name
+            accessor.store(filename)
+            blob_wrapper.setContentType(mime_type)
 
 class _ATCTFolderishAudioContainer(ImageMixin,
                                    audioanno.AnnotationAudioContainer,

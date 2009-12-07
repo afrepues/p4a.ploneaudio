@@ -1,0 +1,16 @@
+Testing
+=======
+To use blob during test, we need to import a module from plone.app.blob
+that patches the ZODB. Since we can not unpatch it, and since we have to
+import the patch before any test, there is no way to test both blob support
+and plone basic support.
+Because of that, there are two test runners now.
+./bin/test
+./bin/test-blob
+
+Coverage
+========
+There seems to be no way of running the test coverage runner in a way
+to only test coverage of p4a.blobstorage. There is also no way to test
+coverage of both Blob and File support at once. So no 100% Coverage ever
+

@@ -52,9 +52,13 @@ Podcasting Support
   - basesyndication_ SVN trunk r3214 or higher
   - fatsyndication_ SVN trunk r32123 or higher
 
+Blob Support
+  - plone_app_blob_ SVN trunk
+
 .. _ContentLicensing: http://plone.org/products/contentlicensing
 .. _basesyndication: https://svn.plone.org/svn/collective/basesyndication/
 .. _fatsyndication: https://svn.plone.org/svn/collective/fatsyndication/
+.. _plone_app_blob: http://pypi.python.org/pypi/plone.app.blob
 
 Installation
 ============

@@ -1,3 +1,5 @@
+from plone.app.blob.tests import db
+
 import os
 import doctest
 import unittest
@@ -55,34 +57,5 @@ def test_suite():
                                              package='p4a.ploneaudio',
                                              optionflags=doctest.ELLIPSIS,
                                              test_class=ptc.FunctionalTestCase))
-
-    import p4a.audio.tests
-    pkg_home = Common.package_home({'__name__': 'p4a.audio.tests'})
-    samplesdir = os.path.join(pkg_home, 'samples')
-
-    fields = dict(
-        title=u'Test of the Emercy Broadcast System',
-        artist=u'Rocky Burt',
-        album=u'Emergencies All Around Us',
-        )
-    SAMPLES = (
-        (os.path.join(samplesdir, 'test-full.mp3'), 'audio/mpeg', fields),
-        (os.path.join(samplesdir, 'test-full.ogg'), 'application/ogg', fields),
-        (os.path.join(samplesdir, 'test-no-images.mp3'), 'audio/mpeg', fields),
-    )
-
-    for relsamplefile, mimetype, samplefields in SAMPLES:
-        class MediaTestCase(ptc.FunctionalTestCase):
-            required_mimetype = mimetype
-            samplefile = os.path.join(samplesdir, relsamplefile)
-            file_content_type = 'File'
-            fields = samplefields
-
-        test = ztc.FunctionalDocFileSuite('plone-audio-impl.txt',
-                                          package='p4a.ploneaudio',
-                                          optionflags=doctest.ELLIPSIS,
-                                          test_class=MediaTestCase)
-
-        suite.addTest(test)
 
     return suite
